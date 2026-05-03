@@ -5,11 +5,14 @@ services:
     # image: ghcr.io/moesnow/march7thassistant:latest
     # image: ghcr.nju.edu.cn/moesnow/march7thassistant:latest
     volumes:
-      - ./config.yaml:/m7a/config.yaml
       - ./logs:/m7a/logs
       - ./3rdparty/WebBrowser/UserProfile:/m7a/3rdparty/WebBrowser/UserProfile
+      - ./webui/data:/m7a/webui/data
+    ports:
+      - "8080:8080"
     environment:
       - MARCH7TH_LOG_LEVEL=DEBUG
+      - WEBUI_TOKEN=your_secret_token_here
     network_mode: "bridge"
     shm_size: 1g
     # 默认命令为 python main.py，即完整运行。

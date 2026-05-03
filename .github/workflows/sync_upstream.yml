@@ -1,0 +1,95 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # 每天凌晨 2 点执行一次 (UTC 时间 18:00)
+    - cron: '0 18 * * *'
+  workflow_dispatch: # 允许在 GitHub Actions 页面手动点击运行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 需要完整的历史记录来进行合并
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add Upstream Remote
+        run: |
+          # 替换为原作者的真实仓库地址及主分支名
+          UPSTREAM_URL="https://github.com/moesnow/March7thAssistant.git"
+          UPSTREAM_BRANCH="main"
+          
+          git remote add upstream $UPSTREAM_URL
+          git fetch upstream $UPSTREAM_BRANCH
+
+      - name: Try Merge Upstream
+        id: merge
+        run: |
+          # 尝试使用 merge 合并上游代码
+          # --no-edit 自动接受默认的合并提交信息
+          if git merge upstream/main --no-edit; then
+            echo "conflict=false" >> $GITHUB_OUTPUT
+          else
+            echo "合并发生冲突，中止合并..."
+            git merge --abort
+            echo "conflict=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push successful merge
+        if: steps.merge.outputs.conflict == 'false'
+        run: |
+          git push origin main
+
+      - name: Handle Sync on Conflict
+        if: steps.merge.outputs.conflict == 'true'
+        run: |
+          # 固定分支名，防止 PR 堆积
+          BRANCH_NAME="upstream-sync-template"
+          
+          # 检查远程是否已有该分支，如果有则同步，没有则创建
+          if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
+            git fetch origin $BRANCH_NAME
+            git checkout $BRANCH_NAME
+            # 将最新的 main 合并进来，确保不丢失本地已有的自定义修改
+            git merge main --no-edit || true
+          else
+            git checkout -b $BRANCH_NAME
+          fi
+          
+          # 尝试将最新的上游代码合并到该冲突解决分支
+          echo "尝试合并上游最新代码到冲突分支..."
+          git merge upstream/main --no-edit || true
+          
+          # 提交更改（包含可能的冲突标记）
+          git add .
+          git commit -m "chore: update upstream sync branch with latest changes" || true
+          git push origin $BRANCH_NAME
+          
+          # 检查是否已经存在开启的 PR
+          PR_EXISTS=$(gh pr list --head $BRANCH_NAME --state open --json number --jq '.[0].number')
+          
+          if [ -z "$PR_EXISTS" ]; then
+            echo "创建新的同步 PR..."
+            gh pr create \
+              --title "⚠️ [自动同步] 发现上游更新，需要手动解决冲突" \
+              --body "自动同步上游仓库失败，存在文件冲突。\n\n**处理建议：**\n1. 在本地执行 \`git fetch origin && git checkout $BRANCH_NAME\`\n2. 解决冲突后提交并推送到此分支。\n3. 合并此 PR 到 main 分支。\n\n*此 PR 会在上游有新更新时自动追加提交，无需重复创建。*" \
+              --base main \
+              --head $BRANCH_NAME
+          else
+            echo "已存在 PR #$PR_EXISTS，已自动追加最新上游更改。"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

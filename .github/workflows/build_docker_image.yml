@@ -1,0 +1,89 @@
+name: Build & Publish Docker Image Auto
+
+# 触发条件：
+# 1. workflow_dispatch: 支持在 GitHub Actions 页面手动触发
+# 2. push.tags: 当推送符合 v*.*.* 格式的标签时自动触发（如 v1.0.0）
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+    branches:
+      - main
+
+# 环境变量：定义 Docker 镜像仓库和镜像名称
+env:
+  REGISTRY: ghcr.io # 使用 GitHub Container Registry
+  IMAGE_NAME: ${{ github.repository }} # 镜像名称使用仓库全名
+
+jobs:
+  build-and-push:
+    # 如果是 tag 且 tag 名称包含 'beta'（例如 v1.2.3-beta），则跳过此 job（手动触发除外）
+    if: github.event_name == 'workflow_dispatch' || github.ref_type != 'tag' || !contains(github.ref_name, 'beta')
+    runs-on: ubuntu-latest
+    # 权限设置：需要读取仓库内容和写入 GitHub Packages
+    permissions:
+      contents: read # 读取仓库代码
+      packages: write # 推送镜像到 GitHub Container Registry
+    steps:
+      # 步骤 1: 检出代码
+      # submodules: "false" - 不检出子模块，减少构建时间
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: "false"
+
+      # 步骤 2: 设置 Docker Buildx
+      # Buildx 是 Docker 的扩展构建工具，支持多平台构建和缓存优化
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 步骤 3: 登录到容器镜像仓库
+      # 使用 GitHub Token 自动登录到 ghcr.io
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }} # 当前触发工作流的用户
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub 自动提供的 Token
+
+      # 步骤 4: 提取镜像元数据（标签和标注）
+      # 根据不同的触发条件自动生成合适的镜像标签
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-,enable=${{ github.ref_type != 'tag' }}
+          flavor: |
+            latest=false
+
+      # 步骤 5: 构建并推送 Docker 镜像
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # 构建上下文为当前目录
+          push: true # 构建完成后自动推送到镜像仓库
+          platforms: linux/amd64,linux/arm64 # 构建多平台镜像，支持 amd64 和 arm64
+          tags: ${{ steps.meta.outputs.tags }} # 使用上一步生成的标签
+          labels: ${{ steps.meta.outputs.labels }} # 使用上一步生成的标注（包含版本、提交信息等元数据）
+          cache-from: type=gha # 从 GitHub Actions 缓存读取构建缓存，加速构建
+          cache-to: type=gha,mode=max # 将构建缓存写入 GitHub Actions，mode=max 表示缓存所有层
+          provenance: false
+          sbom: false
+
+      # 步骤 6: 自动清理旧版本镜像
+      # 仅保留最近的 5 个版本，防止 GHCR 存储占用过大
+      - name: Delete old image versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ github.event.repository.name }}
+          package-type: 'container'
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: 'false' # 设置为 false 以便按版本数量清理，而不仅仅是清理无标签镜像
+          ignore-versions: '^(latest|main)$' # 绝对不要删除 latest 或 main 标签
+

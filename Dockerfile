@@ -40,6 +40,7 @@ ENV MARCH7TH_DOCKER_STARTED=true
 WORKDIR /m7a
 
 COPY requirements-docker.txt ./
+COPY webui/requirements.txt ./webui/requirements.txt
 
 # ======================
 # System dependencies
@@ -89,7 +90,8 @@ RUN python -m venv $VIRTUAL_ENV \
     && pip install --no-cache-dir \
     # 如果需要使用国内源，可以取消下面一行的注释
     # -i https://mirrors.cloud.tencent.com/pypi/simple/ \
-    -r requirements-docker.txt
+    -r requirements-docker.txt \
+    -r webui/requirements.txt
 
 COPY build.py ./
 
@@ -112,4 +114,4 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["python", "main.py"]
+CMD ["python", "webui/main.py"]

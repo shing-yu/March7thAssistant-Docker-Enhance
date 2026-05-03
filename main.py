@@ -84,13 +84,16 @@ import atexit
 import base64
 
 if sys.platform == 'win32':
-    import pyuac
-    if not pyuac.isUserAdmin():
-        try:
-            pyuac.runAsAdmin(False)
-            sys.exit(0)
-        except Exception:
-            sys.exit(1)
+    # 当从 WebUI 或 Docker 启动时，跳过 UAC 提权以防止环境丢失和后台挂起
+    from utils.console import is_gui_started, is_docker_started
+    if not is_gui_started() and not is_docker_started():
+        import pyuac
+        if not pyuac.isUserAdmin():
+            try:
+                pyuac.runAsAdmin(False)
+                sys.exit(0)
+            except Exception:
+                sys.exit(1)
 
 from module.config import cfg
 from module.logger import log

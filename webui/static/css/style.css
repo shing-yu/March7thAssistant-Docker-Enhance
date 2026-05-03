@@ -1,0 +1,95 @@
+/* Element Plus Custom Overrides for Tailwind Integration */
+:root {
+  --el-color-primary: #8b5cf6 !important;
+  --el-color-primary-light-3: #a78bfa !important;
+  --el-color-primary-light-5: #c4b5fd !important;
+  --el-color-primary-light-7: #ddd6fe !important;
+  --el-color-primary-light-9: #ede9fe !important;
+  --el-color-primary-dark-2: #7c3aed !important;
+  
+  --el-bg-color: transparent !important;
+  --el-bg-color-overlay: #1e293b !important;
+  --el-bg-color-page: transparent !important;
+  
+  --el-text-color-primary: #f8fafc !important;
+  --el-text-color-regular: #cbd5e1 !important;
+  
+  --el-border-color: rgba(255, 255, 255, 0.1) !important;
+  --el-border-color-light: rgba(255, 255, 255, 0.05) !important;
+  --el-border-color-lighter: rgba(255, 255, 255, 0.02) !important;
+  --el-fill-color-blank: rgba(15, 23, 42, 0.5) !important;
+  
+  --el-mask-color: rgba(2, 6, 23, 0.8) !important;
+}
+
+[v-cloak] {
+  display: none !important;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* Page Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Custom Inputs & Cards */
+.el-input__wrapper {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset !important;
+  backdrop-filter: blur(8px);
+}
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset !important;
+}
+.el-table {
+  background-color: transparent !important;
+}
+.el-table tr, .el-table th.el-table__cell {
+  background-color: rgba(15, 23, 42, 0.3) !important;
+}
+.el-table td.el-table__cell, .el-table th.el-table__cell.is-leaf {
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+.el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+}
+.el-dialog {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+.el-dialog__header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-right: 0 !important;
+  padding-bottom: 1rem !important;
+}
+.el-dialog__title {
+  color: #f8fafc !important;
+  font-weight: 600;
+}
+.el-form-item__label {
+  color: #cbd5e1 !important;
+}

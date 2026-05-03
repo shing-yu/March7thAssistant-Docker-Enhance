@@ -159,7 +159,11 @@ class CloudGameController(GameControllerBase):
         })
 
     def _prepare_browser_and_driver(self, browser_type: str, integrated: bool) -> tuple[str, str]:
-        self.user_profile_path = os.path.join(self.BROWSER_INSTALL_PATH, "UserProfile", self.cfg.browser_type.capitalize())
+        env_profile_dir = os.environ.get("MARCH7TH_USER_PROFILE_DIR")
+        if env_profile_dir:
+            self.user_profile_path = env_profile_dir
+        else:
+            self.user_profile_path = os.path.join(self.BROWSER_INSTALL_PATH, "UserProfile", self.cfg.browser_type.capitalize())
         # 判断环境变量 MARCH7TH_BROWSER_PATH 和 MARCH7TH_DRIVER_PATH，同时存在时优先使用
         env_browser_path = os.environ.get("MARCH7TH_BROWSER_PATH")
         env_driver_path = os.environ.get("MARCH7TH_DRIVER_PATH")
@@ -256,7 +260,7 @@ class CloudGameController(GameControllerBase):
         args.extend(self.cfg.browser_launch_argument)  # 用户自定义参数
         return args
 
-    def _connect_or_create_browser(self, headless=False) -> None:
+    def _connect_or_create_browser(self, headless=False, _retry=False) -> None:
         """尝试连接到现有的（由小助手启动的）浏览器，如果没有，那就创建一个"""
         browser_type = "chrome" if self.cfg.browser_type in ["integrated", "chrome"] else "edge" if self.cfg.browser_type == "edge" else "chromium"
         integrated = self.cfg.browser_type == "integrated"
@@ -325,6 +329,25 @@ class CloudGameController(GameControllerBase):
             self.log_debug("浏览器启动成功")
         except SessionNotCreatedException as e:
             self.log_error(f"浏览器启动失败: {e}")
+            
+            # 自动修复浏览器配置文件损坏导致无法启动的问题
+            if "cannot parse internal JSON template" in str(e) and not _retry:
+                self.log_warning("检测到浏览器配置文件损坏 (通常因强制退出导致)，正在尝试清理并重试...")
+                import shutil
+                prefs_files = [
+                    os.path.join(self.user_profile_path, "Local State"),
+                    os.path.join(self.user_profile_path, "Default", "Preferences")
+                ]
+                for pf in prefs_files:
+                    try:
+                        if os.path.exists(pf):
+                            os.remove(pf)
+                            self.log_debug(f"已删除损坏的文件: {pf}")
+                    except Exception as ex:
+                        self.log_warning(f"删除失败 {pf}: {ex}")
+                self.log_info("重新尝试启动浏览器...")
+                return self._connect_or_create_browser(headless=headless, _retry=True)
+
             # 清理残留文件，防止浏览器无法启动
             if is_docker_started():
                 singleton_files = ["SingletonCookie", "SingletonLock", "SingletonSocket"]
@@ -396,6 +419,8 @@ class CloudGameController(GameControllerBase):
         if not self.driver:
             return
         try:
+            import os
+            os.makedirs(os.path.dirname(self.COOKIE_PATH), exist_ok=True)
             cookies_json = json.dumps(self.driver.get_cookies(), ensure_ascii=False, indent=4)
             with open(self.COOKIE_PATH, "wb") as f:
                 # f.write(wdp_encrypt(cookies_json.encode()))
