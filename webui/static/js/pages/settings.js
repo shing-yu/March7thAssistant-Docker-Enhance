@@ -3,33 +3,33 @@ const Settings = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 m-0">全局设置 (Settings)</h2>
-          <p class="text-slate-400 mt-1">Configure global automation schedule and preferences.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">全局设置 (Settings)</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">Configure global automation schedule and preferences.</p>
         </div>
       </div>
       
-      <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl p-8 shadow-xl max-w-2xl relative overflow-hidden group">
+      <div class="card-glass p-8 max-w-2xl relative overflow-hidden group">
         <!-- Decoration -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-indigo-500/20"></div>
         
         <el-form label-position="top" class="relative z-10 custom-form">
           <div class="mb-8">
-            <h3 class="text-lg font-semibold text-slate-200 mb-6 flex items-center border-b border-white/5 pb-4">
-              <el-icon class="mr-2 text-violet-400"><MagicStick /></el-icon>
+            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-6 flex items-center border-b border-slate-200 dark:border-white/5 pb-4">
+              <el-icon class="mr-2 text-violet-500 dark:text-violet-400"><MagicStick /></el-icon>
               自动化调度
             </h3>
             
-            <div class="flex items-start justify-between bg-slate-900/40 p-5 rounded-xl border border-white/5 mb-6">
+            <div class="flex items-start justify-between bg-slate-100/50 dark:bg-slate-900/40 p-5 rounded-xl border border-slate-200 dark:border-white/5 mb-6">
               <div>
-                <label class="block text-base font-medium text-slate-200 mb-1">自动排队运行</label>
-                <div class="text-sm text-slate-400">启用后，将在指定时间自动开始按顺序运行已启用的各个账号的任务。</div>
+                <label class="block text-base font-medium text-slate-700 dark:text-slate-200 mb-1">自动排队运行</label>
+                <div class="text-sm text-slate-500 dark:text-slate-400">启用后，将在指定时间自动开始按顺序运行已启用的各个账号的任务。</div>
               </div>
               <el-switch v-model="settings.auto_run" size="large" />
             </div>
             
-            <div class="bg-slate-900/40 p-5 rounded-xl border border-white/5" :class="{'opacity-50 pointer-events-none': !settings.auto_run}">
-              <label class="block text-base font-medium text-slate-200 mb-1">每日定时启动时间</label>
-              <div class="text-sm text-slate-400 mb-4">设置每天触发云游戏队列运行的具体时间（推荐避开服务器繁忙时段）。</div>
+            <div class="bg-slate-100/50 dark:bg-slate-900/40 p-5 rounded-xl border border-slate-200 dark:border-white/5" :class="{'opacity-50 pointer-events-none': !settings.auto_run}">
+              <label class="block text-base font-medium text-slate-700 dark:text-slate-200 mb-1">每日定时启动时间</label>
+              <div class="text-sm text-slate-500 dark:text-slate-400 mb-4">设置每天触发云游戏队列运行的具体时间（推荐避开服务器繁忙时段）。</div>
               <el-time-picker 
                 v-model="settings.scheduled_time" 
                 format="HH:mm"

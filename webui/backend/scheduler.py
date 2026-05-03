@@ -125,6 +125,7 @@ class Scheduler:
             }
             history_entry['accounts'].append(acc_result)
             self._run_single_account(account, acc_result)
+            self._save_history()  # 每次账号运行结束后立即保存状态，以便前端及时更新
 
         history_entry['end_time'] = datetime.now().isoformat()
         self._save_history()  # 运行结束后保存

@@ -3,7 +3,7 @@ const Dashboard = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 m-0">运行与日志 (Dashboard)</h2>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">运行与日志 (Dashboard)</h2>
           <p class="text-slate-400 mt-1">Monitor your execution status and real-time logs.</p>
         </div>
       </div>
@@ -13,11 +13,11 @@ const Dashboard = {
         <div class="lg:col-span-1 space-y-6">
           
           <!-- Status Card -->
-          <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+          <div class="card-glass p-6 relative overflow-hidden group">
             <div class="absolute top-0 right-0 w-32 h-32 bg-violet-500/10 rounded-full blur-2xl -mr-10 -mt-10 transition-all group-hover:bg-violet-500/20"></div>
             
-            <h3 class="text-lg font-semibold text-slate-200 mb-4 flex items-center">
-              <el-icon class="mr-2 text-violet-400"><Odometer /></el-icon>
+            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center">
+              <el-icon class="mr-2 text-violet-500 dark:text-violet-400"><Odometer /></el-icon>
               执行状态
             </h3>
             
@@ -31,10 +31,10 @@ const Dashboard = {
                   {{ status.running ? 'Running' : 'Idle' }}
                 </span>
               </div>
-              <div v-if="status.running" class="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
+              <div v-if="status.running" class="bg-slate-100/50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700/50">
                 <span class="text-xs text-slate-500 uppercase tracking-wider block mb-1">Current Account</span>
-                <span class="text-sm text-slate-300 font-medium">{{ status.current_account_name || 'Loading...' }}</span>
-                <span class="text-[10px] text-slate-600 font-mono block mt-1">{{ status.current_account_id }}</span>
+                <span class="text-sm text-slate-700 dark:text-slate-300 font-medium">{{ status.current_account_name || 'Loading...' }}</span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-600 font-mono block mt-1">{{ status.current_account_id }}</span>
               </div>
             </div>
             
@@ -42,16 +42,16 @@ const Dashboard = {
               <button @click="startRun" :disabled="status.running" class="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-medium py-2 px-4 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.4)] disabled:shadow-none flex items-center justify-center">
                 <el-icon class="mr-1"><VideoPlay /></el-icon> 立即运行
               </button>
-              <button @click="stopRun" :disabled="!status.running" class="flex-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 disabled:bg-slate-800 disabled:text-slate-600 font-medium py-2 px-4 rounded-xl border border-rose-500/20 disabled:border-transparent transition-all flex items-center justify-center">
+              <button @click="stopRun" :disabled="!status.running" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-300 dark:disabled:text-slate-600 font-medium py-2 px-4 rounded-xl border border-rose-500/20 disabled:border-transparent transition-all flex items-center justify-center">
                 <el-icon class="mr-1"><VideoPause /></el-icon> 停止
               </button>
             </div>
           </div>
 
           <!-- History Card -->
-          <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-xl h-[400px] flex flex-col">
-            <h3 class="text-lg font-semibold text-slate-200 mb-4 flex items-center">
-              <el-icon class="mr-2 text-violet-400"><Clock /></el-icon>
+          <div class="card-glass p-6 h-[400px] flex flex-col">
+            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center">
+              <el-icon class="mr-2 text-violet-500 dark:text-violet-400"><Clock /></el-icon>
               历史记录
             </h3>
             
@@ -90,12 +90,12 @@ const Dashboard = {
         
         <!-- Right Column (Logs) -->
         <div class="lg:col-span-2">
-          <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl h-[600px] flex flex-col overflow-hidden">
-            <div class="flex justify-between items-center px-6 py-4 border-b border-white/5 bg-slate-900/30">
-              <h3 class="text-lg font-semibold text-slate-200 m-0 flex items-center">
-                <el-icon class="mr-2 text-violet-400"><Document /></el-icon>
+          <div class="card-glass h-[600px] flex flex-col overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 header-glass">
+              <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 m-0 flex items-center">
+                <el-icon class="mr-2 text-violet-500 dark:text-violet-400"><Document /></el-icon>
                 日志输出
-                <span v-if="currentLogFile" class="ml-3 px-2 py-1 bg-slate-800 rounded text-xs text-slate-400 font-mono border border-slate-700">{{ currentLogFile }}</span>
+                <span v-if="currentLogFile" class="ml-3 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs text-slate-500 dark:text-slate-400 font-mono border border-slate-200 dark:border-slate-700">{{ currentLogFile }}</span>
               </h3>
               <div class="flex items-center gap-2">
                 <button v-if="currentLogFile" @click="downloadLog" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-all" title="下载完整日志">
@@ -171,8 +171,21 @@ const Dashboard = {
   methods: {
     async fetchData() {
       try {
+        const oldStatus = this.status;
         this.status = await api.get('/status');
         this.history = await api.get('/history');
+        
+        // 如果当前正在运行，且启用了自动滚动，且账号发生切换，则自动切换日志文件
+        if (this.status.running && this.isAutoScroll && oldStatus.current_account_id && oldStatus.current_account_id !== this.status.current_account_id) {
+          if (this.history.length > 0) {
+            const currentRun = this.history[0];
+            const activeAcc = currentRun.accounts.find(a => a.account_id === this.status.current_account_id);
+            if (activeAcc) {
+              this.currentLogFile = activeAcc.log_file;
+            }
+          }
+        }
+
         if (this.currentLogFile) {
           this.refreshLog();
         } else if (this.history.length > 0 && this.history[0].accounts.length > 0) {

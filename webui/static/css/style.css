@@ -20,6 +20,7 @@ html.dark {
   --el-border-color-lighter: rgba(255, 255, 255, 0.02) !important;
   --el-fill-color-blank: rgba(15, 23, 42, 0.5) !important;
   --el-mask-color: rgba(2, 6, 23, 0.8) !important;
+  --el-text-color-placeholder: #64748b !important;
 }
 
 /* Light Theme Overrides */
@@ -34,6 +35,7 @@ html:not(.dark) {
   --el-border-color-lighter: rgba(0, 0, 0, 0.02) !important;
   --el-fill-color-blank: #ffffff !important;
   --el-mask-color: rgba(255, 255, 255, 0.8) !important;
+  --el-text-color-placeholder: #94a3b8 !important;
 }
 
 [v-cloak] {
@@ -54,6 +56,35 @@ html:not(.dark) {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.5);
+}
+
+/* Theme-aware Card & Header */
+.card-glass {
+  backdrop-filter: blur(20px);
+  border-radius: 1.25rem;
+  transition: all 0.3s ease;
+}
+html.dark .card-glass {
+  background-color: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+html:not(.dark) .card-glass {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.header-glass {
+  backdrop-filter: blur(10px);
+}
+html.dark .header-glass {
+  background-color: rgba(15, 23, 42, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+html:not(.dark) .header-glass {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Page Transitions */
@@ -104,11 +135,11 @@ html.dark .el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell
   padding-bottom: 1rem !important;
 }
 .el-dialog__title {
-  color: #f8fafc !important;
+  color: var(--el-text-color-primary) !important;
   font-weight: 600;
 }
 .el-form-item__label {
-  color: #cbd5e1 !important;
+  color: var(--el-text-color-regular) !important;
 }
 
 /* Custom Message Box for Edit Prompts */
@@ -130,7 +161,7 @@ html.dark .el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell
   border-color: #8b5cf6 !important;
 }
 .custom-message-box .el-message-box__btns .el-button:not(.el-button--primary) {
-  background-color: rgba(30, 41, 59, 0.5) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #cbd5e1 !important;
+  background-color: rgba(148, 163, 184, 0.1) !important;
+  border-color: var(--el-border-color) !important;
+  color: var(--el-text-color-regular) !important;
 }

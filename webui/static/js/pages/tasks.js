@@ -5,11 +5,11 @@ const Tasks = {
     <div class="h-full flex flex-col space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 m-0">任务配置 (Tasks)</h2>
-          <p class="text-slate-400 mt-1">Configure global workflow and override settings per account using the YAML editor.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">任务配置 (Tasks)</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">Configure global workflow and override settings per account using the YAML editor.</p>
         </div>
         <div class="flex gap-3">
-          <div class="bg-slate-800/60 rounded-xl p-1 border border-white/5 flex items-center shadow-lg backdrop-blur-md">
+          <div class="bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
             <el-select v-model="selectedAccount" placeholder="全局配置 (Global)" @change="loadConfig" clearable class="!bg-transparent custom-el-select w-64">
               <el-option label="全局配置 (Global)" value=""></el-option>
               <el-option
@@ -28,12 +28,12 @@ const Tasks = {
         </div>
       </div>
 
-      <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl flex-1 relative overflow-hidden flex flex-col group">
+      <div class="card-glass flex-1 relative overflow-hidden flex flex-col group">
         <!-- Glow effect -->
         <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-violet-600/10 rounded-full blur-[60px] pointer-events-none transition-all group-hover:bg-violet-600/20"></div>
         
         <!-- Editor Header -->
-        <div class="px-4 py-2 border-b border-white/5 bg-slate-900/50 flex items-center justify-between z-10">
+        <div class="px-4 py-2 header-glass flex items-center justify-between z-10">
           <div class="flex gap-2">
             <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
@@ -45,7 +45,7 @@ const Tasks = {
         </div>
         
         <!-- Editor Container (Absolute inset to prevent flex loop bugs) -->
-        <div class="relative flex-1 w-full bg-[#1e1e1e] z-10">
+        <div class="relative flex-1 w-full bg-[#1e1e1e] dark:bg-[#1e1e1e] z-10">
           <div id="monaco-editor" class="absolute inset-0"></div>
         </div>
       </div>
@@ -66,7 +66,7 @@ const Tasks = {
       this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
         value: '',
         language: 'yaml',
-        theme: 'vs-dark',
+        theme: document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs',
         automaticLayout: true,
         minimap: { enabled: false },
         fontSize: 14,
@@ -79,6 +79,17 @@ const Tasks = {
         cursorSmoothCaretAnimation: 'on'
       });
       this.loadConfig();
+      
+      // Theme watcher for Monaco
+      this.themeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            const isDark = document.documentElement.classList.contains('dark');
+            monaco.editor.setTheme(isDark ? 'vs-dark' : 'vs');
+          }
+        });
+      });
+      this.themeObserver.observe(document.documentElement, { attributes: true });
     };
 
     if (window.monaco && window.monaco.editor) {
@@ -94,6 +105,9 @@ const Tasks = {
     }
   },
   beforeUnmount() {
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+    }
     if (this.editor) {
       this.editor.dispose();
       this.editor = null;

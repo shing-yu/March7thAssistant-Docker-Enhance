@@ -3,16 +3,16 @@ const Accounts = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 m-0">账号配置 (Accounts)</h2>
-          <p class="text-slate-400 mt-1">Manage multiple cloud game accounts and execution priority.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">账号配置 (Accounts)</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">Manage multiple cloud game accounts and execution priority.</p>
         </div>
         <button @click="showAddDialog = true" class="bg-violet-600 hover:bg-violet-500 text-white font-medium py-2 px-5 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center">
           <el-icon class="mr-2"><Plus /></el-icon> 新增账号
         </button>
       </div>
 
-      <div class="bg-slate-800/40 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-        <div class="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl transition-all group-hover:bg-fuchsia-500/20"></div>
+      <div class="card-glass p-6 relative overflow-hidden group">
+        <div class="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/5 dark:bg-fuchsia-500/10 rounded-full blur-3xl transition-all group-hover:bg-fuchsia-500/20"></div>
         
         <el-table :data="accounts" row-key="id" style="width: 100%;" class="bg-transparent">
           <el-table-column prop="order" label="执行顺序" width="120" align="center">
@@ -31,7 +31,7 @@ const Accounts = {
           <el-table-column prop="name" label="账号名称">
             <template #default="scope">
               <div class="flex items-center">
-                <span class="font-medium text-slate-200 text-base mr-2">{{ scope.row.name }}</span>
+                <span class="font-medium text-slate-700 dark:text-slate-200 text-base mr-2">{{ scope.row.name }}</span>
                 <button @click="editName(scope.row)" class="p-1 text-slate-500 hover:text-violet-400 transition-colors mr-3" title="修改名称">
                   <el-icon><EditPen /></el-icon>
                 </button>
