@@ -253,11 +253,15 @@ const Dashboard = {
       URL.revokeObjectURL(url);
     },
     getAccStatusClass(item, acc) {
-      if (!item.end_time) return 'bg-sky-500/10 text-sky-400 border border-sky-500/20';
+      if (this.status && this.status.running && this.status.current_account_id === acc.account_id && !item.end_time) {
+        return 'bg-sky-500/10 text-sky-400 border border-sky-500/20';
+      }
       return acc.success ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
     },
     getAccStatusText(item, acc) {
-      if (!item.end_time) return '运行中';
+      if (this.status && this.status.running && this.status.current_account_id === acc.account_id && !item.end_time) {
+        return '运行中';
+      }
       return acc.success ? '成功' : '失败';
     },
     handleScroll() {
