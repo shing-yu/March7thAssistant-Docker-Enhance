@@ -1,6 +1,6 @@
 # Tutorial
 
-> This document was translated from the Simplified Chinese version using AI. Last updated: 2026-04-24. If anything differs, the Simplified Chinese version takes precedence.
+> This document was translated from the Simplified Chinese version using AI. Last updated: 2026-05-03. If anything differs, the Simplified Chinese version takes precedence.
 
 ## Before You Run
 
@@ -68,7 +68,7 @@ Common examples:
 
 `March7th Launcher.exe main -e` (exit automatically after the task finishes successfully)
 
-Common task names include: `main` (full workflow), `daily` (Daily Training), `power` (Spend Trailblaze Power), `currencywars` (Currency Wars), and more.
+Common task names include: `main` (full workflow), `routine` (Daily), `daily` (Daily Training), `power` (Spend Trailblaze Power), `currencywars` (Currency Wars), and more.
 
 If you know you want to run a task but forgot the exact task name, run `March7th Launcher.exe -l` to see the latest list.
 
@@ -94,13 +94,17 @@ The default daily refresh time is 4:00 AM. Weekly content usually refreshes ever
 
 ### Daily
 
-The `Daily` menu on the home page includes `Daily Training` and `Spend Trailblaze Power`.
+The `Daily` menu on the home page includes `Daily`, `Daily Training`, and `Spend Trailblaze Power`.
+
+`Daily` ignores refresh timers for this daily slice and runs the enabled steps based on your current settings: redemption codes, cultivation target initialization, activity checks, Echo of War, spending Trailblaze Power, Daily Training, and final reward collection. Only disabled items are skipped automatically.
 
 `Daily Training` first checks which training objectives are still unfinished, then attempts to complete them automatically. If you only want to farm stages with Trailblaze Power, use `Spend Trailblaze Power` directly.
 
 `Spend Trailblaze Power` automatically calculates the number of runs based on the instance type and instance name you selected in settings,
 
 and also works together with options such as Reserved Trailblaze Power, Fuel, support characters, and training targets.
+
+If you disable `Enable Spend Power` in Power Settings, both `Full Run` and `Daily` will skip Echo of War and Spend Trailblaze Power together. Running `Spend Trailblaze Power` as a standalone task is not affected by this switch.
 
 ### Currency Wars
 
@@ -322,7 +326,7 @@ About `OCR Acceleration Mode`: keeping it on `Auto` is recommended first. The mo
 - Otherwise, if OpenVINO is detected, use OpenVINO CPU. If neither applies, fall back to ONNXRuntime CPU.
 - `GPU (ONNXRuntime DirectML)`: Force DirectML GPU acceleration and fall back automatically if the environment is unsupported.
 - `CPU (OpenVINO)`: Force OpenVINO CPU inference. On pure CPU workloads, OpenVINO is often faster than ONNXRuntime CPU,
-- but **it may continuously increase memory usage**. The assistant periodically recreates the engine to release memory and downgrades to ONNXRuntime CPU when available memory gets low.
+- and the current version applies a temporary workaround for the OpenVINO CPU runtime cache issue. If available physical memory drops below 1 GB, it will automatically fall back to ONNXRuntime CPU.
 - `CPU (ONNXRuntime)`: Force ONNXRuntime CPU inference. It has the best compatibility and the most stable memory behavior.
 - If you encounter recognition issues, crashes, or unusually high memory usage, switch manually to `CPU (ONNXRuntime)` first.
 

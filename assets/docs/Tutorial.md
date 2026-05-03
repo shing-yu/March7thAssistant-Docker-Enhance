@@ -66,7 +66,7 @@ March7th Launcher.exe daily （启动图形界面并执行每日实训）
 
 March7th Launcher.exe main -e （任务正常完成后自动退出程序）
 
-常见任务名称包括：`main`（完整运行）、`daily`（每日实训）、`power`（清体力）、`currencywars`（货币战争）等。
+常见任务名称包括：`main`（完整运行）、`routine`（日常）、`daily`（每日实训）、`power`（清体力）、`currencywars`（货币战争）等。
 
 如果你只记得要运行某个任务，但忘了参数名，直接执行 `March7th Launcher.exe -l` 查看最新列表即可。
 
@@ -92,13 +92,17 @@ March7th Launcher.exe main -e （任务正常完成后自动退出程序）
 
 ### 日常
 
-首页 `日常` 菜单包含 `每日实训` 和 `清体力`。
+首页 `日常` 菜单包含 `日常`、`每日实训` 和 `清体力`。
+
+`日常` 会忽略这组内容的刷新状态，按当前设置依次处理兑换码、培养目标初始化、活动检测、历战余响、清体力和每日实训，并在最后领取可领取的奖励；只有未开启的内容会自动跳过。
 
 `每日实训` 会先识别尚未完成的实训任务，再尝试自动完成；如果你只想单独刷本耗体力，直接使用 `清体力` 即可。
 
 `清体力` 会根据你在设置中选择的副本类型和副本名称自动计算挑战次数，
 
 也会配合后备开拓力、燃料、支援角色、培养目标等选项一起生效。
+
+如果你在体力设置里关闭了 `启用清体力`，`完整运行` 和 `日常` 会一并跳过历战余响与清体力；单独执行 `清体力` 任务不受这个开关影响。
 
 ### 货币战争
 
@@ -336,7 +340,7 @@ March7th Launcher.exe main -e （任务正常完成后自动退出程序）
 - 否则若检测到 OpenVINO 则使用 OpenVINO CPU；都不满足则回退到 ONNXRuntime CPU。
 - `GPU (ONNXRuntime DirectML)`：强制使用 DirectML GPU 加速，环境不支持时自动回退。
 - `CPU (OpenVINO)`：强制使用 OpenVINO CPU 推理。OpenVINO 在纯 CPU 场景下通常比 ONNXRuntime CPU 更快，
-- 但**存在内存持续增长的问题**——程序会定期重新初始化引擎以释放内存，并在可用内存不足时降级到 ONNXRuntime CPU。
+- 当前版本已针对 OpenVINO CPU runtime cache 问题应用临时规避方案；若可用物理内存低于 1GB，会自动降级到 ONNXRuntime CPU。
 - `CPU (ONNXRuntime)`：强制使用 ONNXRuntime CPU 推理，兼容性最好、内存行为最稳定。
 - 如果遇到识别异常、闪退或内存占用过高，可手动切换为 `CPU (ONNXRuntime)`。
 
