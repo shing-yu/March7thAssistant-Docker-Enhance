@@ -1,4 +1,4 @@
-/* Element Plus Custom Overrides for Tailwind Integration */
+/* Theme Variables */
 :root {
   --el-color-primary: #8b5cf6 !important;
   --el-color-primary-light-3: #a78bfa !important;
@@ -6,20 +6,34 @@
   --el-color-primary-light-7: #ddd6fe !important;
   --el-color-primary-light-9: #ede9fe !important;
   --el-color-primary-dark-2: #7c3aed !important;
-  
+}
+
+/* Dark Theme Overrides */
+html.dark {
   --el-bg-color: transparent !important;
   --el-bg-color-overlay: #1e293b !important;
   --el-bg-color-page: transparent !important;
-  
   --el-text-color-primary: #f8fafc !important;
   --el-text-color-regular: #cbd5e1 !important;
-  
   --el-border-color: rgba(255, 255, 255, 0.1) !important;
   --el-border-color-light: rgba(255, 255, 255, 0.05) !important;
   --el-border-color-lighter: rgba(255, 255, 255, 0.02) !important;
   --el-fill-color-blank: rgba(15, 23, 42, 0.5) !important;
-  
   --el-mask-color: rgba(2, 6, 23, 0.8) !important;
+}
+
+/* Light Theme Overrides */
+html:not(.dark) {
+  --el-bg-color: #ffffff !important;
+  --el-bg-color-overlay: #ffffff !important;
+  --el-bg-color-page: #f8fafc !important;
+  --el-text-color-primary: #1e293b !important;
+  --el-text-color-regular: #64748b !important;
+  --el-border-color: rgba(0, 0, 0, 0.1) !important;
+  --el-border-color-light: rgba(0, 0, 0, 0.05) !important;
+  --el-border-color-lighter: rgba(0, 0, 0, 0.02) !important;
+  --el-fill-color-blank: #ffffff !important;
+  --el-mask-color: rgba(255, 255, 255, 0.8) !important;
 }
 
 [v-cloak] {
@@ -55,8 +69,8 @@
 
 /* Custom Inputs & Cards */
 .el-input__wrapper {
-  background-color: rgba(15, 23, 42, 0.6) !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset !important;
+  background-color: var(--el-fill-color-blank) !important;
+  box-shadow: 0 0 0 1px var(--el-border-color) inset !important;
   backdrop-filter: blur(8px);
 }
 .el-input__wrapper.is-focus {
@@ -66,23 +80,26 @@
   background-color: transparent !important;
 }
 .el-table tr, .el-table th.el-table__cell {
-  background-color: rgba(15, 23, 42, 0.3) !important;
+  background-color: transparent !important;
 }
 .el-table td.el-table__cell, .el-table th.el-table__cell.is-leaf {
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  border-bottom: 1px solid var(--el-border-color-light) !important;
 }
 .el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell {
+  background-color: var(--el-color-primary-light-9) !important;
+}
+html.dark .el-table--enable-row-hover .el-table__body tr:hover>td.el-table__cell {
   background-color: rgba(139, 92, 246, 0.1) !important;
 }
 .el-dialog {
-  background-color: rgba(15, 23, 42, 0.85) !important;
+  background-color: var(--el-bg-color-overlay) !important;
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--el-border-color) !important;
   border-radius: 1rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3) !important;
 }
 .el-dialog__header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--el-border-color-lighter);
   margin-right: 0 !important;
   padding-bottom: 1rem !important;
 }
@@ -91,5 +108,29 @@
   font-weight: 600;
 }
 .el-form-item__label {
+  color: #cbd5e1 !important;
+}
+
+/* Custom Message Box for Edit Prompts */
+.custom-message-box {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+.custom-message-box .el-message-box__title {
+  color: #f8fafc !important;
+}
+.custom-message-box .el-message-box__content {
+  color: #cbd5e1 !important;
+}
+.custom-message-box .el-message-box__btns .el-button--primary {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+}
+.custom-message-box .el-message-box__btns .el-button:not(.el-button--primary) {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
   color: #cbd5e1 !important;
 }

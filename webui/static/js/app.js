@@ -15,7 +15,8 @@ const app = Vue.createApp({
     return {
       isAuthenticated: false,
       tokenInput: '',
-      loginLoading: false
+      loginLoading: false,
+      isDark: true
     }
   },
   computed: {
@@ -24,6 +25,16 @@ const app = Vue.createApp({
     }
   },
   mounted() {
+    // Theme initialization
+    const savedTheme = localStorage.getItem('m7a_theme');
+    if (savedTheme === 'light') {
+      this.isDark = false;
+      document.documentElement.classList.remove('dark');
+    } else {
+      this.isDark = true;
+      document.documentElement.classList.add('dark');
+    }
+
     const token = localStorage.getItem('m7a_webui_token');
     if (token) {
       this.isAuthenticated = true;
@@ -54,6 +65,16 @@ const app = Vue.createApp({
       localStorage.removeItem('m7a_webui_token');
       this.isAuthenticated = false;
       this.tokenInput = '';
+    },
+    toggleTheme() {
+      this.isDark = !this.isDark;
+      if (this.isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('m7a_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('m7a_theme', 'light');
+      }
     }
   }
 });

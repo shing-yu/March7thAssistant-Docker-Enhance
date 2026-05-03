@@ -30,9 +30,14 @@ const Accounts = {
           
           <el-table-column prop="name" label="账号名称">
             <template #default="scope">
-              <span class="font-medium text-slate-200 text-base mr-2">{{ scope.row.name }}</span>
-              <span v-if="scope.row.is_logged_in" class="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">已登录</span>
-              <span v-else class="px-2 py-0.5 rounded text-xs bg-slate-500/20 text-slate-400 border border-slate-500/30">未登录</span>
+              <div class="flex items-center">
+                <span class="font-medium text-slate-200 text-base mr-2">{{ scope.row.name }}</span>
+                <button @click="editName(scope.row)" class="p-1 text-slate-500 hover:text-violet-400 transition-colors mr-3" title="修改名称">
+                  <el-icon><EditPen /></el-icon>
+                </button>
+                <span v-if="scope.row.is_logged_in" class="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">已登录</span>
+                <span v-else class="px-2 py-0.5 rounded text-xs bg-slate-500/20 text-slate-400 border border-slate-500/30">未登录</span>
+              </div>
             </template>
           </el-table-column>
           
@@ -164,6 +169,27 @@ const Accounts = {
         this.fetchAccounts();
       }
     },
+    async editName(account) {
+      try {
+        const { value } = await ElementPlus.ElMessageBox.prompt('请输入新的账号名称', '编辑账号', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: account.name,
+          inputPattern: /\S+/,
+          inputErrorMessage: '名称不能为空',
+          customClass: 'custom-message-box'
+        });
+        
+        if (value && value !== account.name) {
+          const updatedAcc = { ...account, name: value };
+          await api.put(`/accounts/${account.id}`, updatedAcc);
+          ElementPlus.ElMessage.success('账号名已更新');
+          await this.fetchAccounts();
+        }
+      } catch (e) {
+        // 用户取消输入
+      }
+    },
     async deleteAccount(id) {
       try {
         await api.delete(`/accounts/${id}`);
@@ -221,6 +247,7 @@ const Accounts = {
           if (res.status === 'success') {
             this.qrStatus = 'success';
             this.stopQrPolling();
+            this.fetchAccounts(); // 登录成功后刷新账号列表
             setTimeout(() => { this.showQrDialog = false; }, 2000);
           } else if (res.status === 'failed') {
             this.qrStatus = 'failed';
