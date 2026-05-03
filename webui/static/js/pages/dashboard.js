@@ -72,7 +72,7 @@ const Dashboard = {
                         <span class="text-xs px-2 py-0.5 rounded-full" :class="getAccStatusClass(item, acc)">
                           {{ getAccStatusText(item, acc) }}
                         </span>
-                        <button @click="viewLog(acc.log_file)" class="text-violet-400 hover:text-violet-300 transition-colors" title="查看日志">
+                        <button @click="viewLog(acc.log_file, !!item.end_time)" class="text-violet-400 hover:text-violet-300 transition-colors" title="查看日志">
                           <el-icon><Document /></el-icon>
                         </button>
                       </div>
@@ -107,7 +107,7 @@ const Dashboard = {
               </div>
             </div>
             
-            <div class="flex-1 bg-[#020617] p-4 overflow-y-auto font-mono text-[13px] leading-relaxed text-slate-300 custom-scrollbar" ref="logConsole">
+            <div class="flex-1 bg-[#020617] p-4 overflow-y-auto font-mono text-[13px] leading-relaxed text-slate-300 custom-scrollbar" ref="logConsole" @scroll="handleScroll">
               <div v-if="!currentLogFile" class="h-full flex items-center justify-center text-slate-600">
                 请在左侧选择一次运行历史以查看日志...
               </div>
@@ -128,7 +128,9 @@ const Dashboard = {
       currentLogFile: null,
       currentLog: '',
       logLoading: false,
-      pollInterval: null
+      pollInterval: null,
+      isAutoScroll: true,
+      resumeScrollTimeout: null
     }
   },
   computed: {
@@ -164,6 +166,7 @@ const Dashboard = {
   },
   unmounted() {
     clearInterval(this.pollInterval);
+    if (this.resumeScrollTimeout) clearTimeout(this.resumeScrollTimeout);
   },
   methods: {
     async fetchData() {
@@ -198,11 +201,13 @@ const Dashboard = {
         ElementPlus.ElMessage.error('停止失败');
       }
     },
-    viewLog(filename) {
+    viewLog(filename, isHistory = false) {
       this.currentLogFile = filename;
-      this.refreshLog();
+      if (this.resumeScrollTimeout) clearTimeout(this.resumeScrollTimeout);
+      this.isAutoScroll = !isHistory;
+      this.refreshLog(isHistory);
     },
-    async refreshLog() {
+    async refreshLog(forceToTop = false) {
       if (!this.currentLogFile) return;
       this.logLoading = true;
       try {
@@ -211,7 +216,11 @@ const Dashboard = {
         this.$nextTick(() => {
           const consoleEl = this.$refs.logConsole;
           if (consoleEl) {
-            consoleEl.scrollTop = 0;
+            if (forceToTop) {
+              consoleEl.scrollTop = 0;
+            } else if (this.isAutoScroll) {
+              consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
           }
         });
       } catch (err) {
@@ -237,6 +246,40 @@ const Dashboard = {
     getAccStatusText(item, acc) {
       if (!item.end_time) return '运行中';
       return acc.success ? '成功' : '失败';
+    },
+    handleScroll() {
+      const el = this.$refs.logConsole;
+      if (!el) return;
+      
+      // 判断是否在底部 (阈值 50px)
+      const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+      
+      if (isAtBottom) {
+        this.isAutoScroll = true;
+        if (this.resumeScrollTimeout) {
+          clearTimeout(this.resumeScrollTimeout);
+          this.resumeScrollTimeout = null;
+        }
+      } else {
+        // 用户向上滚动，暂停自动滚动
+        this.isAutoScroll = false;
+        
+        // 设置 5 秒后恢复自动滚动
+        if (this.resumeScrollTimeout) clearTimeout(this.resumeScrollTimeout);
+        this.resumeScrollTimeout = setTimeout(() => {
+          this.isAutoScroll = true;
+          this.scrollToBottom();
+        }, 5000);
+      }
+    },
+    scrollToBottom() {
+      const el = this.$refs.logConsole;
+      if (el) {
+        el.scrollTo({
+          top: el.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     }
   }
 };
