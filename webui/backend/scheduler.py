@@ -5,6 +5,7 @@ import subprocess
 import threading
 from datetime import datetime
 import ruamel.yaml
+from module.game.cloud import CloudGameController
 
 from .account_manager import account_manager, DATA_DIR, PROFILES_DIR
 
@@ -94,6 +95,14 @@ class Scheduler:
             except subprocess.TimeoutExpired:
                 self.current_process.kill()
             self.running = False
+            
+            # 清理可能残留的由小助手启动的浏览器进程
+            try:
+                controller = CloudGameController.__new__(CloudGameController)
+                controller.close_all_m7a_browser()
+            except Exception as e:
+                print(f"清理残留浏览器进程失败: {e}")
+                
             return True
         return False
 

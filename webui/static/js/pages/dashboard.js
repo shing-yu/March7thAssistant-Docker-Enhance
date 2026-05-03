@@ -189,7 +189,8 @@ const Dashboard = {
         if (this.currentLogFile) {
           this.refreshLog();
         } else if (this.history.length > 0 && this.history[0].accounts.length > 0) {
-          this.currentLogFile = this.history[0].accounts[0].log_file;
+          const currentRunAccounts = this.history[0].accounts;
+          this.currentLogFile = currentRunAccounts[currentRunAccounts.length - 1].log_file;
           this.refreshLog();
         }
       } catch (err) {
