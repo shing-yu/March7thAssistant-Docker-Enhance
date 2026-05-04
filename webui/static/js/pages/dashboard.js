@@ -64,15 +64,15 @@ const Dashboard = {
                   :type="item.end_time ? 'success' : 'primary'"
                   :hollow="!item.end_time"
                 >
-                  <div class="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30 mt-1">
-                    <div class="text-xs text-slate-500 mb-2 font-mono">ID: {{ item.run_id }}</div>
-                    <div v-for="acc in item.accounts" :key="acc.account_id" class="flex items-center justify-between py-1 border-t border-slate-700/30 first:border-0">
-                      <span class="text-sm text-slate-300 truncate max-w-[120px]" :title="acc.account_name">{{ acc.account_name }}</span>
+                  <div class="bg-slate-100 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-200 dark:border-slate-700/30 mt-1">
+                    <div class="text-xs text-slate-500 dark:text-slate-500 mb-2 font-mono">ID: {{ item.run_id }}</div>
+                    <div v-for="acc in item.accounts" :key="acc.account_id" class="flex items-center justify-between py-1 border-t border-slate-200 dark:border-slate-700/30 first:border-0">
+                      <span class="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[120px]" :title="acc.account_name">{{ acc.account_name }}</span>
                       <div class="flex items-center gap-2">
                         <span class="text-xs px-2 py-0.5 rounded-full" :class="getAccStatusClass(item, acc)">
                           {{ getAccStatusText(item, acc) }}
                         </span>
-                        <button @click="viewLog(acc.log_file, !!item.end_time)" class="text-violet-400 hover:text-violet-300 transition-colors" title="查看日志">
+                        <button @click="viewLog(acc.log_file, !!item.end_time)" class="text-violet-500 hover:text-violet-600 dark:text-violet-400 dark:hover:text-violet-300 transition-colors" title="查看日志">
                           <el-icon><Document /></el-icon>
                         </button>
                       </div>
@@ -98,10 +98,10 @@ const Dashboard = {
                 <span v-if="currentLogFile" class="ml-3 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs text-slate-500 dark:text-slate-400 font-mono border border-slate-200 dark:border-slate-700">{{ currentLogFile }}</span>
               </h3>
               <div class="flex items-center gap-2">
-                <button v-if="currentLogFile" @click="downloadLog" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-all" title="下载完整日志">
+                <button v-if="currentLogFile" @click="downloadLog" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-all" title="下载完整日志">
                   <el-icon><Download /></el-icon>
                 </button>
-                <button @click="refreshLog" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-all" title="刷新">
+                <button @click="refreshLog" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-all" title="刷新">
                   <el-icon :class="{'is-loading': logLoading}"><Refresh /></el-icon>
                 </button>
               </div>
@@ -255,9 +255,9 @@ const Dashboard = {
     },
     getAccStatusClass(item, acc) {
       if (this.status && this.status.running && this.status.current_account_id === acc.account_id && !item.end_time) {
-        return 'bg-sky-500/10 text-sky-400 border border-sky-500/20';
+        return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 dark:border-sky-500/30';
       }
-      return acc.success ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+      return acc.success ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 dark:border-rose-500/30';
     },
     getAccStatusText(item, acc) {
       if (this.status && this.status.running && this.status.current_account_id === acc.account_id && !item.end_time) {
