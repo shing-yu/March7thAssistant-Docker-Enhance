@@ -81,6 +81,7 @@ const NOTIFY_PROVIDERS = [
 ];
 
 const Tasks = {
+  props: ['isAdmin', 'boundAccountId'],
   template: `
     <div class="h-full flex flex-col space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
@@ -91,9 +92,9 @@ const Tasks = {
         <div class="flex flex-wrap gap-3">
           <div class="bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
             <el-select v-model="selectedAccount" placeholder="全局配置 (Global)" @change="loadConfig" clearable class="!bg-transparent custom-el-select w-64">
-              <el-option label="全局配置 (Global)" value=""></el-option>
+              <el-option label="全局配置 (只读)" value="" :disabled="false" />
               <el-option
-                v-for="acc in accounts"
+                v-for="acc in filteredAccounts"
                 :key="acc.id"
                 :label="acc.name + ' (覆盖配置)'"
                 :value="acc.id">
@@ -104,7 +105,7 @@ const Tasks = {
             <button @click="setMode('simple')" :class="modeButtonClass('simple')">简洁模式</button>
             <button @click="setMode('advanced')" :class="modeButtonClass('advanced')">高级模式</button>
           </div>
-          <button @click="saveConfig" :disabled="saving || !!parseError" class="bg-violet-600 hover:bg-violet-500 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center">
+          <button @click="saveConfig" :disabled="saving || !!parseError || !canSave" class="bg-violet-600 hover:bg-violet-500 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center" :title="canSave ? '' : '暂无保存权限'">
             <el-icon v-if="saving" class="is-loading mr-2"><Loading /></el-icon>
             <el-icon v-else class="mr-2"><Check /></el-icon>
             {{ saving ? 'Saving...' : '保存配置' }}
@@ -440,6 +441,15 @@ const Tasks = {
   computed: {
     isAccountMode() {
       return !!this.selectedAccount;
+    },
+    filteredAccounts() {
+      if (this.isAdmin) return this.accounts;
+      return this.accounts.filter(a => a.id === this.boundAccountId);
+    },
+    canSave() {
+      if (this.isAdmin) return true;
+      if (this.isAccountMode && this.selectedAccount === this.boundAccountId) return true;
+      return false;
     },
     allInstanceTypes() {
       return Object.keys(this.options.instance_names || {});

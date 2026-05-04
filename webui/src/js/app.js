@@ -17,7 +17,6 @@ const app = Vue.createApp({
 
     <!-- Login Screen -->
     <div v-if="!isAuthenticated" class="flex-1 flex justify-center items-center relative overflow-hidden">
-      <!-- Decorative background elements -->
       <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl"></div>
       <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-3xl"></div>
 
@@ -35,11 +34,11 @@ const app = Vue.createApp({
           <h2
             class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 mb-2">
             March7th WebUI</h2>
-          <p class="text-slate-400 text-sm">Please enter your token to continue</p>
+          <p class="text-slate-400 text-sm">请输入管理员 Token 或账号密钥登录</p>
         </div>
 
         <div class="space-y-6">
-          <el-input v-model="tokenInput" type="password" placeholder="Access Token" @keyup.enter="login" size="large"
+          <el-input v-model="tokenInput" type="password" placeholder="管理员 Token / 账号密钥" @keyup.enter="login" size="large"
             show-password class="custom-el-input">
           </el-input>
 
@@ -49,7 +48,7 @@ const app = Vue.createApp({
               <el-icon v-if="loginLoading" class="is-loading mr-2">
                 <Loading />
               </el-icon>
-              {{ loginLoading ? 'Authenticating...' : 'Enter System' }}
+              {{ loginLoading ? 'Authenticating...' : '进入系统' }}
             </span>
           </button>
         </div>
@@ -68,6 +67,18 @@ const app = Vue.createApp({
           <h1
             class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 tracking-wide">
             M7A WebUI</h1>
+        </div>
+
+        <!-- User info bar -->
+        <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800/60">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-xs font-medium" :class="userInfo.role === 'admin' ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'">
+              {{ userInfo.role === 'admin' ? '管理员' : '账号用户' }}
+            </span>
+          </div>
+          <div class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate" :title="userInfo.bound_account_name || ''">
+            {{ userInfo.role === 'admin' ? '全部账号管理权限' : (userInfo.bound_account_name ? '绑定账号: ' + userInfo.bound_account_name : '') }}
+          </div>
         </div>
 
         <div class="flex-1 py-6 px-4 overflow-y-auto custom-scrollbar">
@@ -134,14 +145,13 @@ const app = Vue.createApp({
 
       <!-- Main Content -->
       <main class="flex-1 relative overflow-x-hidden overflow-y-auto custom-scrollbar">
-        <!-- Background accents for main content -->
         <div
           class="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[100px] -z-10 pointer-events-none">
         </div>
         <div class="p-8 h-full">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
-              <component :is="Component" />
+              <component :is="Component" :isAdmin="userInfo.role === 'admin'" :boundAccountId="userInfo.bound_account_id" />
             </transition>
           </router-view>
         </div>
@@ -153,7 +163,12 @@ const app = Vue.createApp({
       isAuthenticated: false,
       tokenInput: '',
       loginLoading: false,
-      isDark: true
+      isDark: true,
+      userInfo: {
+        role: 'account',
+        bound_account_id: null,
+        bound_account_name: null
+      }
     }
   },
   computed: {
@@ -162,7 +177,6 @@ const app = Vue.createApp({
     }
   },
   mounted() {
-    // Theme initialization
     const savedTheme = localStorage.getItem('m7a_theme');
     if (savedTheme === 'light') {
       this.isDark = false;
@@ -173,35 +187,68 @@ const app = Vue.createApp({
     }
 
     const token = localStorage.getItem('m7a_webui_token');
+    const userInfoStr = localStorage.getItem('m7a_user_info');
     if (token) {
-      this.isAuthenticated = true;
+      if (userInfoStr) {
+        try {
+          this.userInfo = JSON.parse(userInfoStr);
+          this.isAuthenticated = true;
+        } catch (e) {
+          this.isAuthenticated = false;
+        }
+      } else {
+        this.fetchUserInfo().then(() => {
+          if (this.userInfo.role) {
+            this.isAuthenticated = true;
+          }
+        });
+      }
     }
   },
   methods: {
+    async fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('m7a_webui_token');
+        const info = await axios.get('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.userInfo = info.data;
+        localStorage.setItem('m7a_user_info', JSON.stringify(info.data));
+      } catch (err) {
+        this.logout();
+      }
+    },
     async login() {
       if (!this.tokenInput) {
-        ElementPlus.ElMessage.warning('请输入 Token');
+        ElementPlus.ElMessage.warning('请输入 Token 或密钥');
         return;
       }
       this.loginLoading = true;
       try {
-        // test token by calling settings endpoint
-        await axios.get('/api/settings', {
+        const info = await axios.get('/api/auth/me', {
           headers: { Authorization: `Bearer ${this.tokenInput}` }
         });
+        this.userInfo = info.data;
         localStorage.setItem('m7a_webui_token', this.tokenInput);
+        localStorage.setItem('m7a_user_info', JSON.stringify(info.data));
         this.isAuthenticated = true;
-        ElementPlus.ElMessage.success('登录成功');
+        if (info.data.role === 'admin') {
+          ElementPlus.ElMessage.success('管理员登录成功');
+        } else {
+          ElementPlus.ElMessage.success('已绑定账号: ' + (info.data.bound_account_name || ''));
+        }
       } catch (err) {
-        ElementPlus.ElMessage.error('Token 错误或无效');
+        ElementPlus.ElMessage.error('Token 或密钥无效');
       } finally {
         this.loginLoading = false;
       }
     },
     logout() {
       localStorage.removeItem('m7a_webui_token');
+      localStorage.removeItem('m7a_user_info');
       this.isAuthenticated = false;
       this.tokenInput = '';
+      this.userInfo = { role: 'account', bound_account_id: null, bound_account_name: null };
     },
     toggleTheme() {
       this.isDark = !this.isDark;

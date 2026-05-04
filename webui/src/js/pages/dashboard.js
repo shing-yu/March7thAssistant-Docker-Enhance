@@ -1,6 +1,7 @@
 const { api, ElementPlus } = window;
 
 const Dashboard = {
+  props: ['isAdmin'],
   template: `
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
@@ -40,13 +41,16 @@ const Dashboard = {
               </div>
             </div>
             
-            <div class="flex gap-3">
+            <div v-if="isAdmin" class="flex gap-3">
               <button @click="startRun" :disabled="status.running" class="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-medium py-2 px-4 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.4)] disabled:shadow-none flex items-center justify-center">
                 <el-icon class="mr-1"><VideoPlay /></el-icon> 立即运行
               </button>
               <button @click="stopRun" :disabled="!status.running" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-300 dark:disabled:text-slate-600 font-medium py-2 px-4 rounded-xl border border-rose-500/20 disabled:border-transparent transition-all flex items-center justify-center">
                 <el-icon class="mr-1"><VideoPause /></el-icon> 停止
               </button>
+            </div>
+            <div v-else class="text-sm text-slate-500 text-center py-2">
+              任务控制仅管理员可用
             </div>
           </div>
 

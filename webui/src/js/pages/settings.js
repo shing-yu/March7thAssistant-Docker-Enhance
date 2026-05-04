@@ -1,6 +1,7 @@
 const { api, ElementPlus } = window;
 
 const Settings = {
+  props: ['isAdmin'],
   template: `
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
@@ -26,10 +27,10 @@ const Settings = {
                 <label class="block text-base font-medium text-slate-700 dark:text-slate-200 mb-1">自动排队运行</label>
                 <div class="text-sm text-slate-500 dark:text-slate-400">启用后，将在指定时间自动开始按顺序运行已启用的各个账号的任务。</div>
               </div>
-              <el-switch v-model="settings.auto_run" size="large" />
+              <el-switch v-model="settings.auto_run" size="large" :disabled="!isAdmin" />
             </div>
             
-            <div class="bg-slate-100/50 dark:bg-slate-900/40 p-5 rounded-xl border border-slate-200 dark:border-white/5" :class="{'opacity-50 pointer-events-none': !settings.auto_run}">
+            <div class="bg-slate-100/50 dark:bg-slate-900/40 p-5 rounded-xl border border-slate-200 dark:border-white/5" :class="{'opacity-50 pointer-events-none': !settings.auto_run || !isAdmin}">
               <label class="block text-base font-medium text-slate-700 dark:text-slate-200 mb-1">每日定时启动时间</label>
               <div class="text-sm text-slate-500 dark:text-slate-400 mb-4">设置每天触发云游戏队列运行的具体时间（推荐避开服务器繁忙时段）。</div>
               <el-time-picker 
@@ -37,17 +38,19 @@ const Settings = {
                 format="HH:mm"
                 value-format="HH:mm"
                 placeholder="选择时间"
+                :disabled="!isAdmin"
                 class="w-full sm:w-64">
               </el-time-picker>
             </div>
           </div>
 
           <div class="pt-6 border-t border-white/5 flex justify-end">
-            <button @click.prevent="saveSettings" :disabled="saving" class="bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 px-8 rounded-xl transition-all shadow-[0_0_20px_-5px_rgba(139,92,246,0.5)] flex items-center">
+            <button v-if="isAdmin" @click.prevent="saveSettings" :disabled="saving" class="bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 px-8 rounded-xl transition-all shadow-[0_0_20px_-5px_rgba(139,92,246,0.5)] flex items-center">
               <el-icon v-if="saving" class="is-loading mr-2"><Loading /></el-icon>
               <el-icon v-else class="mr-2"><Check /></el-icon>
               {{ saving ? 'Saving...' : '保存全局设置' }}
             </button>
+            <span v-else class="text-sm text-slate-500">全局设置仅管理员可修改</span>
           </div>
         </el-form>
       </div>

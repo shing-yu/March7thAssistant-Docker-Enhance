@@ -16,7 +16,11 @@ api.interceptors.response.use(
   error => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('m7a_webui_token');
+      localStorage.removeItem('m7a_user_info');
       window.location.reload();
+    }
+    if (error.response && error.response.status === 403) {
+      ElementPlus.ElMessage.error('无权限执行此操作');
     }
     return Promise.reject(error);
   }
