@@ -92,7 +92,7 @@ const Tasks = {
         <div class="flex flex-wrap sm:flex-nowrap gap-3">
           <div class="w-full sm:w-64 bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
             <el-select v-model="selectedAccount" placeholder="全局配置 (Global)" @change="loadConfig" clearable class="!bg-transparent custom-el-select w-full">
-              <el-option label="全局配置 (只读)" value="" :disabled="false" />
+              <el-option label="全局配置 (Global)" value="" :disabled="false" />
               <el-option
                 v-for="acc in filteredAccounts"
                 :key="acc.id"
