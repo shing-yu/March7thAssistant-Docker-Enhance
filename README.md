@@ -1,4 +1,122 @@
 <div align="center">
+  <h1>🐳 March7thAssistant Docker-Enhance</h1>
+  <p>专为每日任务场景、Docker 容器化部署和远程 Web 管理设计的 <b>三月七小助手</b> 增强版本</p>
+
+  <a href="https://github.com/shing-yu/March7thAssistant-Docker-Enhance/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/shing-yu/March7thAssistant-Docker-Enhance"></a>
+  <a href="https://github.com/shing-yu/March7thAssistant-Docker-Enhance/pulls"><img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/shing-yu/March7thAssistant-Docker-Enhance"></a>
+  <img alt="License" src="https://img.shields.io/badge/License-GPL%20v3-blue.svg">
+</div>
+
+<br/>
+
+> [!WARNING]  
+> **功能限制说明**：本增强版专注于**每日任务自动化**及轻量级远程管理，暂不支持差分宇宙、货币战争等高阶扩展功能。如需完整体验，请使用原版桌面端。
+
+---
+
+## ✨ 核心增强功能
+
+* 🖥️ **全新 Web 管理界面**
+    * 基于 **Vue 3 + Element Plus** 构建的现代化响应式后台。
+    * 完美适配移动端浏览器，支持侧边栏抽屉导航，支持深色/浅色模式无缝切换。
+* 👥 **多账号与权限系统 (RBAC)**
+    * **无限多开**：支持无限账号添加，并可灵活调整每个账号的执行队列顺序。
+    * **管理员模式**：使用全局 Token 登录，统筹管理所有账号与系统配置。
+    * **用户模式**：使用账号专属密钥（Secret Key）登录，用户仅能查看自身状态并修改私有任务配置。
+* ⚙️ **灵活的配置策略**
+    * 支持**全局通用配置**与**账号特定配置覆盖 (Config Override)**，极大提升多账号维护效率。
+* 📱 **无痛扫码登录**
+    * Web 界面深度集成“云·星穹铁道”扫码流程。
+    * 直接使用米游社 App 扫码即可完成授权，全程**无需接触容器内部环境**。
+
+---
+
+## 🚀 快速部署 (Docker)
+
+### 1. 准备配置文件
+在您的服务器上创建一个新目录并新建 `docker-compose.yml` 文件：
+
+```bash
+mkdir m7a-docker && cd m7a-docker
+vim docker-compose.yml
+```
+
+### 2. 写入 Docker Compose 配置
+将以下内容填入 `docker-compose.yml` 中，并按需修改环境变量：
+
+```yaml
+services:
+  march7thassistant:
+    container_name: m7a
+    image: ghcr.io/shing-yu/march7thassistant-docker-enhance:main
+    ports:
+      - "18080:8080"  # [宿主机端口]:[容器内端口]，可根据需求修改左侧端口
+    volumes:
+      - ./logs:/m7a/logs
+      - ./3rdparty/WebBrowser/UserProfile:/m7a/3rdparty/WebBrowser/UserProfile
+      - ./webui/data:/m7a/webui/data
+    environment:
+      - MARCH7TH_LOG_LEVEL=DEBUG
+      - WEBUI_TOKEN=your_secret_token_here  # ⚠️ 请务必修改为您自己的强密码 Token
+    network_mode: "bridge"
+    shm_size: 1g
+    restart: unless-stopped
+```
+
+### 3. 启动服务
+使用以下命令在后台拉取镜像并启动容器：
+
+```bash
+docker compose up -d
+```
+> 启动后，打开浏览器访问 `http://<服务器IP>:18080`，使用您在 `WEBUI_TOKEN` 中设置的密码进行初始登录。
+
+---
+
+## 📖 简易使用指南
+
+1.  **添加账号**：登录 WebUI 后，前往“账号配置”页面，点击右上角“新增账号”，输入易于辨识的备注名。
+2.  **扫码授权**：在账号列表中点击“扫码登录”，打开手机上的**米游社 App** 扫描屏幕上的二维码完成登录。
+3.  **配置任务**：
+    * 前往“任务配置”页面。
+    * 您可以在**“全局配置”**中设定通用规则，或选中特定账号进行**“覆盖配置”**。
+    * 支持**简洁模式**（可视化开关）与**高级模式**（直编 YAML 文件）。
+4.  **启动执行**：转到“运行与日志”页面，点击“启动任务”即可开启自动化流程，实时查看运行日志。
+5.  **权限分发**：管理员可在账号列表中提取每个账号生成的**“账号密钥”**，将其发送给对应的代挂用户，实现用户自助管理。
+
+---
+
+## 💻 系统配置要求
+
+确保您的宿主机满足以下条件，以保证 OCR 识别与浏览器环境的稳定运行：
+
+| 硬件/环境 | 最低要求 | 推荐配置 | 说明                       |
+| :--- | :--- | :--- |:-------------------------|
+| **操作系统** | Linux (Ubuntu, Debian, CentOS 等) | Linux 纯净环境 | 需已安装并正常运行 Docker 环境      |
+| **内存 (RAM)** | **4 GB** | 8 GB 或以上 | ⚠️ 内存不足易导致运行崩溃或 OCR 识别失败 |
+| **处理器 (CPU)**| 1 核 | 2 核或以上 | 影响启动速度与图像识别效率            |
+
+---
+
+## 🤝 参与贡献
+
+我们非常欢迎任何形式的贡献！
+* 🐛 提交 [Issue](https://github.com/shing-yu/March7thAssistant-Docker-Enhance/issues) 反馈 Bug 或提出功能建议。
+* 🛠️ 提交 Pull Request (PR) 贡献代码。
+* 📝 帮助我们完善文档或进行多语言翻译。
+
+## 📄 许可证
+
+本项目采用与原项目一致的开源许可证（[GPL-3.0](LICENSE)）。请遵循相关法律法规，仅用于个人学习、技术研究及自动化测试。
+
+---
+
+> [!TIP]
+> **以下为原项目 README 内容：**
+
+---
+
+<div align="center">
   <h1 align="center">
     <img src="./assets/screenshot/March7th.png" width="200">
     <br/>
