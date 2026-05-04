@@ -108,6 +108,7 @@ from module.game import cloud_game
 import tasks.reward as reward
 import tasks.challenge as challenge
 import tasks.version as version
+import tasks.version.app_update as app_update_task
 
 from tasks.daily.daily import Daily
 from tasks.daily.fight import Fight
@@ -260,6 +261,9 @@ def main(action=None, no_run_immediately=False, workflow_name=None, workflow_ste
 
     elif action == "game":
         game.start()
+
+    elif action == "app_update":
+        app_update_task.start()
 
     elif action == "game_update":
         game.update_via_launcher()
