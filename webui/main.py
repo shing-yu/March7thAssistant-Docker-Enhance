@@ -1,5 +1,7 @@
 import os
 import sys
+import io
+import json
 
 # Ensure the parent directory is in sys.path so 'webui' package can be imported
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -7,12 +9,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import time
 import subprocess
 import uvicorn
+import ruamel.yaml
 from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List, Dict
+from pydantic import BaseModel, Field
+from typing import Optional, List
 
 from webui.backend.account_manager import account_manager, DATA_DIR
 from webui.backend.scheduler import scheduler, LOGS_DIR
@@ -29,6 +32,13 @@ app.add_middleware(
 )
 
 TOKEN = os.environ.get("WEBUI_TOKEN", "12345678")
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+ASSETS_CONFIG_DIR = os.path.join(ROOT_DIR, 'assets', 'config')
+
+yaml_parser = ruamel.yaml.YAML()
+yaml_parser.indent(mapping=2, sequence=2, offset=2)
+yaml_parser.preserve_quotes = True
+yaml_parser.compact(seq_seq=False, seq_map=False)
 
 def verify_token(authorization: Optional[str] = Header(None)):
     if not TOKEN:
@@ -36,6 +46,55 @@ def verify_token(authorization: Optional[str] = Header(None)):
     if authorization != f"Bearer {TOKEN}":
         raise HTTPException(status_code=401, detail="Unauthorized")
     return True
+
+def _plain_yaml_value(value):
+    if isinstance(value, dict):
+        return {str(k): _plain_yaml_value(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_plain_yaml_value(v) for v in value]
+    return value
+
+def _load_yaml_text(content: str):
+    try:
+        loaded = yaml_parser.load(content or "") or {}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid YAML: {exc}")
+    if not isinstance(loaded, dict):
+        raise HTTPException(status_code=400, detail="Config YAML must be a mapping")
+    return loaded
+
+def _dump_yaml_text(data) -> str:
+    stream = io.StringIO()
+    yaml_parser.dump(data, stream)
+    return stream.getvalue()
+
+def _read_json_config(filename: str):
+    path = os.path.join(ASSETS_CONFIG_DIR, filename)
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def _flatten_instance_names(instance_names: dict):
+    flattened = []
+    for instance_type, names in instance_names.items():
+        for instance_name, description in names.items():
+            if instance_name == "无":
+                continue
+            display_type = instance_type
+            display_name = instance_name
+            if not display_type.endswith(("）", "」")):
+                display_type += " "
+            if not display_name.startswith(("（", "「")):
+                display_name = " " + display_name
+            flattened.append({
+                "type": instance_type,
+                "name": instance_name,
+                "description": description,
+                "label": f"{display_type}-{display_name}",
+            })
+    return flattened
 
 # --- API 路由 ---
 
@@ -103,12 +162,50 @@ def get_global_config():
 class ConfigData(BaseModel):
     content: str
 
+class ConfigRenderData(BaseModel):
+    content: str = ""
+    values: dict = Field(default_factory=dict)
+    remove_keys: List[str] = Field(default_factory=list)
+
 @app.post("/api/config", dependencies=[Depends(verify_token)])
 def save_global_config(data: ConfigData):
     config_path = os.path.join(DATA_DIR, 'config.yaml')
     with open(config_path, 'w', encoding='utf-8') as f:
         f.write(data.content)
     return {"success": True}
+
+@app.get("/api/config/options", dependencies=[Depends(verify_token)])
+def get_config_options():
+    instance_names = _read_json_config('instance_names.json')
+    character_names = _read_json_config('character_names.json')
+    character_options = [{"value": "None", "label": "无"}]
+    character_options.extend(
+        {"value": key, "label": value}
+        for key, value in character_names.items()
+        if key != "None"
+    )
+    return {
+        "instance_names": instance_names,
+        "flat_instance_names": _flatten_instance_names(instance_names),
+        "characters": character_options,
+    }
+
+@app.post("/api/config/parse", dependencies=[Depends(verify_token)])
+def parse_config(data: ConfigData):
+    parsed = _load_yaml_text(data.content)
+    return {"config": _plain_yaml_value(parsed)}
+
+@app.post("/api/config/render", dependencies=[Depends(verify_token)])
+def render_config(data: ConfigRenderData):
+    parsed = _load_yaml_text(data.content)
+    for key in data.remove_keys or []:
+        parsed.pop(key, None)
+    for key, value in (data.values or {}).items():
+        parsed[key] = value
+    return {
+        "content": _dump_yaml_text(parsed),
+        "config": _plain_yaml_value(parsed),
+    }
 
 @app.get("/api/history", dependencies=[Depends(verify_token)])
 def get_history():

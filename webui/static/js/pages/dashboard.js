@@ -3,8 +3,8 @@ const Dashboard = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">运行与日志 (Dashboard)</h2>
-          <p class="text-slate-400 mt-1">Monitor your execution status and real-time logs.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">运行与日志</h2>
+          <p class="text-slate-400 mt-1">监控执行状态和实时日志</p>
         </div>
       </div>
       
@@ -136,7 +136,7 @@ const Dashboard = {
   computed: {
     formattedLog() {
       if (!this.currentLog) return 'No logs available.';
-      
+
       const lines = this.currentLog.split('\n');
       // 过滤掉 DEBUG 级别的日志
       const filteredLines = lines.filter(line => !line.includes('DEBUG'));
@@ -144,7 +144,7 @@ const Dashboard = {
       this._logTruncated = filteredLines.length > MAX_LINES;
       const displayLog = filteredLines.slice(-MAX_LINES).join('\n');
 
-      
+
       // Simple coloring for common log keywords
       return displayLog
         .replace(/(INFO|DEBUG|WARNING|ERROR)/g, match => {
@@ -174,7 +174,7 @@ const Dashboard = {
         const oldStatus = this.status;
         this.status = await api.get('/status');
         this.history = await api.get('/history');
-        
+
         // 如果当前正在运行，且启用了自动滚动，且账号发生切换，则自动切换日志文件
         if (this.status.running && this.isAutoScroll && oldStatus.current_account_id && oldStatus.current_account_id !== this.status.current_account_id) {
           if (this.history.length > 0) {
@@ -268,10 +268,10 @@ const Dashboard = {
     handleScroll() {
       const el = this.$refs.logConsole;
       if (!el) return;
-      
+
       // 判断是否在底部 (阈值 50px)
       const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
-      
+
       if (isAtBottom) {
         this.isAutoScroll = true;
         if (this.resumeScrollTimeout) {
@@ -281,7 +281,7 @@ const Dashboard = {
       } else {
         // 用户向上滚动，暂停自动滚动
         this.isAutoScroll = false;
-        
+
         // 设置 5 秒后恢复自动滚动
         if (this.resumeScrollTimeout) clearTimeout(this.resumeScrollTimeout);
         this.resumeScrollTimeout = setTimeout(() => {

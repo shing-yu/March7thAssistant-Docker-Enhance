@@ -3,8 +3,8 @@ const Accounts = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">账号配置 (Accounts)</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">Manage multiple cloud game accounts and execution priority.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">账号配置</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">管理多个云游戏账号及执行优先级。</p>
         </div>
         <button @click="showAddDialog = true" class="bg-violet-600 hover:bg-violet-500 text-white font-medium py-2 px-5 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center">
           <el-icon class="mr-2"><Plus /></el-icon> 新增账号
@@ -179,7 +179,7 @@ const Accounts = {
           inputErrorMessage: '名称不能为空',
           customClass: 'custom-message-box'
         });
-        
+
         if (value && value !== account.name) {
           const updatedAcc = { ...account, name: value };
           await api.put(`/accounts/${account.id}`, updatedAcc);
@@ -224,7 +224,7 @@ const Accounts = {
       this.showQrDialog = true;
       this.qrStatus = 'idle';
       this.qrUrl = null;
-      
+
       try {
         const res = await api.post(`/qr_login/start/${account.id}`);
         if (res.success) {

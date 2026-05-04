@@ -143,8 +143,12 @@
         <div class="p-6 border-t border-slate-200 dark:border-slate-800/60 space-y-2">
           <button @click="toggleTheme"
             class="flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-slate-700 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/60 transition-colors">
-            <el-icon v-if="isDark" class="mr-2 text-lg"><Sunny /></el-icon>
-            <el-icon v-else class="mr-2 text-lg"><Moon /></el-icon>
+            <el-icon v-if="isDark" class="mr-2 text-lg">
+              <Sunny />
+            </el-icon>
+            <el-icon v-else class="mr-2 text-lg">
+              <Moon />
+            </el-icon>
             {{ isDark ? '浅色模式' : '深色模式' }}
           </button>
           <button @click="logout"
@@ -153,7 +157,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
-            Logout
+            退出登录
           </button>
         </div>
       </aside>

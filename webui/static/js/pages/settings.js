@@ -3,8 +3,8 @@ const Settings = {
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">全局设置 (Settings)</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">Configure global automation schedule and preferences.</p>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">全局设置</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">设置自动任务运行和参数配置</p>
         </div>
       </div>
       
