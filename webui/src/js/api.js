@@ -1,4 +1,4 @@
-const api = axios.create({
+const api = window.axios.create({
   baseURL: '/api',
   timeout: 10000
 });
@@ -21,3 +21,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+window.api = api;

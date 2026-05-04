@@ -1,3 +1,5 @@
+const { api, ElementPlus } = window;
+
 const Settings = {
   template: `
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
@@ -85,3 +87,5 @@ const Settings = {
     }
   }
 };
+
+window.Settings = Settings;

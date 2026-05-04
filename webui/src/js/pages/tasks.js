@@ -1,3 +1,5 @@
+const { api, ElementPlus, Vue, monaco } = window;
+
 let monacoInitialized = false;
 
 const TASK_FORM_GROUPS = [
@@ -1059,3 +1061,5 @@ const Tasks = {
     }
   }
 };
+
+window.Tasks = Tasks;

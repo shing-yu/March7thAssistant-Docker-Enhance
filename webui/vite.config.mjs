@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
-  base: '/static/',
-  publicDir: 'src',
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/static/' : '/',
   build: {
     outDir: 'static',
     emptyOutDir: true
@@ -13,4 +12,4 @@ export default defineConfig({
       '/api': 'http://127.0.0.1:8080'
     }
   }
-});
+}));

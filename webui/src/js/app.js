@@ -1,3 +1,5 @@
+const { Vue, VueRouter, ElementPlus, ElementPlusIconsVue, Dashboard, Accounts, Tasks, Settings } = window;
+
 const routes = [
   { path: '/', component: Dashboard },
   { path: '/accounts', component: Accounts },

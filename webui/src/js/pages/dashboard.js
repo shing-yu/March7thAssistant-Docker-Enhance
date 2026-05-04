@@ -1,3 +1,5 @@
+const { api, ElementPlus } = window;
+
 const Dashboard = {
   template: `
     <div class="space-y-6 animate-[fadeIn_0.5s_ease-out]">
@@ -301,3 +303,5 @@ const Dashboard = {
     }
   }
 };
+
+window.Dashboard = Dashboard;
