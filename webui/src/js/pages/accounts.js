@@ -17,7 +17,8 @@ const Accounts = {
       <div class="card-glass p-6 relative overflow-hidden group">
         <div class="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/5 dark:bg-fuchsia-500/10 rounded-full blur-3xl transition-all group-hover:bg-fuchsia-500/20"></div>
         
-        <el-table :data="accounts" row-key="id" style="width: 100%;" class="bg-transparent">
+        <div class="overflow-x-auto custom-scrollbar">
+          <el-table :data="accounts" row-key="id" style="width: 100%;" class="bg-transparent">
           <el-table-column prop="order" label="执行顺序" width="120" align="center">
             <template #default="scope">
               <div class="flex flex-col gap-1 items-center justify-center">
@@ -83,6 +84,7 @@ const Accounts = {
             </template>
           </el-table-column>
         </el-table>
+      </div>
         
         <div v-if="accounts.length === 0" class="text-center py-12 text-slate-500">
           暂无配置账号，请管理员添加。

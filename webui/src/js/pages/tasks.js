@@ -89,9 +89,9 @@ const Tasks = {
           <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 m-0">任务配置</h2>
           <p class="text-slate-500 dark:text-slate-400 mt-1">简洁模式编辑常用项，高级模式直接编辑 YAML，二者会在保存前实时同步。</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-          <div class="bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
-            <el-select v-model="selectedAccount" placeholder="全局配置 (Global)" @change="loadConfig" clearable class="!bg-transparent custom-el-select w-64">
+        <div class="flex flex-wrap sm:flex-nowrap gap-3">
+          <div class="w-full sm:w-64 bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
+            <el-select v-model="selectedAccount" placeholder="全局配置 (Global)" @change="loadConfig" clearable class="!bg-transparent custom-el-select w-full">
               <el-option label="全局配置 (只读)" value="" :disabled="false" />
               <el-option
                 v-for="acc in filteredAccounts"
@@ -101,14 +101,14 @@ const Tasks = {
               </el-option>
             </el-select>
           </div>
-          <div class="bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
+          <div class="flex-shrink-0 bg-white/80 dark:bg-slate-800/60 rounded-xl p-1 border border-slate-200 dark:border-white/5 flex items-center shadow-lg backdrop-blur-md">
             <button @click="setMode('simple')" :class="modeButtonClass('simple')">简洁模式</button>
             <button @click="setMode('advanced')" :class="modeButtonClass('advanced')">高级模式</button>
           </div>
-          <button @click="saveConfig" :disabled="saving || !!parseError || !canSave" class="bg-violet-600 hover:bg-violet-500 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center" :title="canSave ? '' : '暂无保存权限'">
+          <button @click="saveConfig" :disabled="saving || !!parseError || !canSave" class="flex-shrink-0 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-xl transition-all shadow-[0_0_15px_-3px_rgba(139,92,246,0.5)] flex items-center" :title="canSave ? '' : '暂无保存权限'">
             <el-icon v-if="saving" class="is-loading mr-2"><Loading /></el-icon>
             <el-icon v-else class="mr-2"><Check /></el-icon>
-            {{ saving ? 'Saving...' : '保存配置' }}
+            {{ saving ? '保存中...' : '保存配置' }}
           </button>
         </div>
       </div>

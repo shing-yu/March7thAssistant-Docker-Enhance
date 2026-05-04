@@ -13,15 +13,32 @@ const router = VueRouter.createRouter({
 });
 
 const app = Vue.createApp({
-  template: `<div class="h-full w-full flex flex-col">
+  template: `<div class="h-full w-full flex flex-col overflow-hidden relative">
+ 
+    <!-- Mobile Header -->
+    <header v-if="isAuthenticated && isMobile" class="h-16 flex-shrink-0 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/50 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/60 z-30">
+      <div class="flex items-center">
+        <button @click="showSidebar = true" class="p-2 mr-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <el-icon class="text-2xl"><Menu /></el-icon>
+        </button>
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/20 mr-2"></div>
+        <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 tracking-wide">M7A</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button @click="toggleTheme" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <el-icon v-if="isDark" class="text-xl"><Sunny /></el-icon>
+          <el-icon v-else class="text-xl"><Moon /></el-icon>
+        </button>
+      </div>
+    </header>
 
     <!-- Login Screen -->
-    <div v-if="!isAuthenticated" class="flex-1 flex justify-center items-center relative overflow-hidden">
+    <div v-if="!isAuthenticated" class="flex-1 flex justify-center items-center relative overflow-hidden px-4">
       <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl"></div>
       <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-3xl"></div>
 
       <div
-        class="w-[420px] bg-bg-glass backdrop-blur-xl border border-glass-border p-10 rounded-3xl shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] z-10 transition-all">
+        class="w-full max-w-[420px] bg-bg-glass backdrop-blur-xl border border-glass-border p-6 sm:p-10 rounded-3xl shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] z-10 transition-all">
         <div class="text-center mb-8">
           <div
             class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg mb-6">
@@ -56,17 +73,27 @@ const app = Vue.createApp({
     </div>
 
     <!-- Main Layout -->
-    <div v-else class="h-full flex overflow-hidden">
+    <div v-else class="flex-1 flex overflow-hidden relative">
+      <!-- Sidebar Overlay (Mobile) -->
+      <div v-if="isMobile && showSidebar" @click="showSidebar = false" class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm z-40 animate-[fadeIn_0.2s_ease-out]"></div>
+
       <!-- Sidebar -->
       <aside
-        class="w-64 flex-shrink-0 flex flex-col bg-white/80 dark:bg-slate-900/50 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/60 transition-all z-20">
-        <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60">
+        :class="[
+          'flex-shrink-0 flex flex-col bg-white/80 dark:bg-slate-900/50 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/60 transition-all duration-300 z-50',
+          isMobile ? 'fixed inset-y-0 left-0 w-72 shadow-2xl' : 'w-64',
+          isMobile && !showSidebar ? '-translate-x-full' : 'translate-x-0'
+        ]">
+        <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/60 relative">
           <div
             class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/20 mr-3">
           </div>
           <h1
             class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 tracking-wide">
             M7A WebUI</h1>
+          <button v-if="isMobile" @click="showSidebar = false" class="absolute right-4 p-2 text-slate-500">
+            <el-icon><Close /></el-icon>
+          </button>
         </div>
 
         <!-- User info bar -->
@@ -83,7 +110,7 @@ const app = Vue.createApp({
 
         <div class="flex-1 py-6 px-4 overflow-y-auto custom-scrollbar">
           <nav class="space-y-2">
-            <router-link to="/"
+            <router-link to="/" @click="isMobile && (showSidebar = false)"
               class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/60 group"
               active-class="bg-violet-500/10 text-violet-600 dark:text-violet-300 border border-violet-500/20 shadow-[inset_0_0_20px_rgba(139,92,246,0.05)]">
               <el-icon class="text-xl mr-3 group-hover:scale-110 transition-transform">
@@ -92,7 +119,7 @@ const app = Vue.createApp({
               <span class="font-medium">运行与日志</span>
             </router-link>
 
-            <router-link to="/accounts"
+            <router-link to="/accounts" @click="isMobile && (showSidebar = false)"
               class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/60 group"
               active-class="bg-violet-500/10 text-violet-600 dark:text-violet-300 border border-violet-500/20 shadow-[inset_0_0_20px_rgba(139,92,246,0.05)]">
               <el-icon class="text-xl mr-3 group-hover:scale-110 transition-transform">
@@ -101,7 +128,7 @@ const app = Vue.createApp({
               <span class="font-medium">账号配置</span>
             </router-link>
 
-            <router-link to="/tasks"
+            <router-link to="/tasks" @click="isMobile && (showSidebar = false)"
               class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/60 group"
               active-class="bg-violet-500/10 text-violet-600 dark:text-violet-300 border border-violet-500/20 shadow-[inset_0_0_20px_rgba(139,92,246,0.05)]">
               <el-icon class="text-xl mr-3 group-hover:scale-110 transition-transform">
@@ -110,7 +137,7 @@ const app = Vue.createApp({
               <span class="font-medium">任务配置</span>
             </router-link>
 
-            <router-link to="/settings"
+            <router-link to="/settings" @click="isMobile && (showSidebar = false)"
               class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/60 group"
               active-class="bg-violet-500/10 text-violet-600 dark:text-violet-300 border border-violet-500/20 shadow-[inset_0_0_20px_rgba(139,92,246,0.05)]">
               <el-icon class="text-xl mr-3 group-hover:scale-110 transition-transform">
@@ -148,7 +175,7 @@ const app = Vue.createApp({
         <div
           class="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[100px] -z-10 pointer-events-none">
         </div>
-        <div class="p-8 h-full">
+        <div class="p-4 sm:p-8 h-full">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <component :is="Component" :isAdmin="userInfo.role === 'admin'" :boundAccountId="userInfo.bound_account_id" />
@@ -164,6 +191,8 @@ const app = Vue.createApp({
       tokenInput: '',
       loginLoading: false,
       isDark: true,
+      isMobile: window.innerWidth < 1024,
+      showSidebar: false,
       userInfo: {
         role: 'account',
         bound_account_id: null,
@@ -204,8 +233,17 @@ const app = Vue.createApp({
         });
       }
     }
+
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   },
   methods: {
+    handleResize() {
+      this.isMobile = window.innerWidth < 1024;
+      if (!this.isMobile) this.showSidebar = false;
+    },
     async fetchUserInfo() {
       try {
         const token = localStorage.getItem('m7a_webui_token');
