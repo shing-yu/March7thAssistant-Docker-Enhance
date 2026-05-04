@@ -130,7 +130,9 @@ class Scheduler:
                 'account_id': account['id'],
                 'account_name': account['name'],
                 'success': False,
-                'log_file': f"log_{run_id}_{account['id']}.txt"
+                'log_file': f"log_{run_id}_{account['id']}.txt",
+                'start_time': None,
+                'end_time': None
             }
             history_entry['accounts'].append(acc_result)
             self._run_single_account(account, acc_result)
@@ -143,6 +145,7 @@ class Scheduler:
         self.current_account_name = None
 
     def _run_single_account(self, account, acc_result):
+        acc_result['start_time'] = datetime.now().isoformat()
         self.current_account_id = account['id']
         self.current_account_name = account['name']
         account_profile_dir = os.path.join(PROFILES_DIR, account['id'])
@@ -220,6 +223,7 @@ class Scheduler:
                 log_file.write(f"\n[WebUI] 执行异常: {e}\n")
             acc_result['success'] = False
         finally:
+            acc_result['end_time'] = datetime.now().isoformat()
             # 运行结束，尝试将特定配置回写到账号覆盖配置中
             if os.path.exists(temp_config_path):
                 try:

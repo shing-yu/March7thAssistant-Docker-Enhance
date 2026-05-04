@@ -71,10 +71,19 @@ const Dashboard = {
                   :hollow="!item.end_time"
                 >
                   <div class="bg-slate-100 dark:bg-slate-900/40 rounded-lg p-3 border border-slate-200 dark:border-slate-700/30 mt-1">
-                    <div class="text-xs text-slate-500 dark:text-slate-500 mb-2 font-mono">ID: {{ item.run_id }}</div>
+                    <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-mono">
+                      <span>ID: {{ item.run_id }}</span>
+                      <span v-if="item.start_time" class="flex items-center gap-1 opacity-80">
+                        <el-icon><Timer /></el-icon>
+                        {{ formatDuration(item.start_time, item.end_time) }}
+                      </span>
+                    </div>
                     <div v-for="acc in item.accounts" :key="acc.account_id" class="flex items-center justify-between py-1 border-t border-slate-200 dark:border-slate-700/30 first:border-0">
                       <span class="text-sm text-slate-600 dark:text-slate-300 truncate max-w-[120px]" :title="acc.account_name">{{ acc.account_name }}</span>
                       <div class="flex items-center gap-2">
+                        <span v-if="acc.start_time" class="text-[10px] text-slate-400 dark:text-slate-500 font-mono italic">
+                          {{ formatDuration(acc.start_time, acc.end_time) }}
+                        </span>
                         <span class="text-xs px-2 py-0.5 rounded-full" :class="getAccStatusClass(item, acc)">
                           {{ getAccStatusText(item, acc) }}
                         </span>
@@ -304,6 +313,17 @@ const Dashboard = {
           behavior: 'smooth'
         });
       }
+    },
+    formatDuration(start, end) {
+      if (!start) return '';
+      const s = new Date(start);
+      const e = end ? new Date(end) : new Date();
+      const diff = Math.floor((e - s) / 1000);
+      if (diff < 0) return '0s';
+      
+      const m = Math.floor(diff / 60);
+      const sec = diff % 60;
+      return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
     }
   }
 };
