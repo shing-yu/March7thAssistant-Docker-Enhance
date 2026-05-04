@@ -119,6 +119,28 @@ html:not(.dark) .header-glass {
 .el-input__wrapper.is-focus {
   box-shadow: 0 0 0 1px var(--el-color-primary) inset !important;
 }
+
+/* Tooltip & Popper Fixes */
+.el-popper {
+  backdrop-filter: blur(12px) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .el-popper {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .el-popper .el-popper__arrow::before {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.el-tooltip__popper.is-dark {
+  background: #1e293b !important;
+}
 .el-table {
   background-color: transparent !important;
 }

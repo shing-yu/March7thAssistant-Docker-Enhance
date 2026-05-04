@@ -190,7 +190,7 @@ const app = Vue.createApp({
       isAuthenticated: false,
       tokenInput: '',
       loginLoading: false,
-      isDark: true,
+      isDark: false,
       isMobile: window.innerWidth < 1024,
       showSidebar: false,
       userInfo: {
@@ -207,12 +207,12 @@ const app = Vue.createApp({
   },
   mounted() {
     const savedTheme = localStorage.getItem('m7a_theme');
-    if (savedTheme === 'light') {
-      this.isDark = false;
-      document.documentElement.classList.remove('dark');
-    } else {
+    if (savedTheme === 'dark') {
       this.isDark = true;
       document.documentElement.classList.add('dark');
+    } else {
+      this.isDark = false;
+      document.documentElement.classList.remove('dark');
     }
 
     const token = localStorage.getItem('m7a_webui_token');
