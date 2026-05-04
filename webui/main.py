@@ -16,6 +16,25 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
+ 
+# --- Pydantic Models ---
+ 
+class AccountCreate(BaseModel):
+    name: str
+ 
+ 
+class AccountReorder(BaseModel):
+    account_ids: List[str]
+ 
+ 
+class ConfigData(BaseModel):
+    content: str
+ 
+ 
+class ConfigRenderData(BaseModel):
+    content: str = ""
+    values: dict = Field(default_factory=dict)
+    remove_keys: List[str] = Field(default_factory=list)
 
 from webui.backend.account_manager import account_manager, DATA_DIR
 from webui.backend.scheduler import scheduler, LOGS_DIR
@@ -182,7 +201,7 @@ def get_accounts(user: UserInfo = Depends(get_current_user)):
 
 
 @app.post("/api/accounts")
-def add_account(data: 'AccountCreate', user: UserInfo = Depends(require_admin)):
+def add_account(data: AccountCreate, user: UserInfo = Depends(require_admin)):
     return account_manager.add_account(data.name)
 
 
@@ -217,8 +236,7 @@ def regenerate_secret_key(account_id: str, user: UserInfo = Depends(require_admi
     return acc
 
 
-class AccountReorder(BaseModel):
-    account_ids: List[str]
+# --- API Routes ---
 
 
 @app.post("/api/accounts/reorder")
@@ -238,16 +256,6 @@ def get_global_config(user: UserInfo = Depends(get_current_user)):
         return {"content": ""}
     with open(config_path, 'r', encoding='utf-8') as f:
         return {"content": f.read()}
-
-
-class ConfigData(BaseModel):
-    content: str
-
-
-class ConfigRenderData(BaseModel):
-    content: str = ""
-    values: dict = Field(default_factory=dict)
-    remove_keys: List[str] = Field(default_factory=list)
 
 
 @app.post("/api/config")
@@ -385,12 +393,6 @@ def get_qr_image(account_id: str):
     if os.path.exists(qr_path):
         return FileResponse(qr_path, media_type="image/png")
     raise HTTPException(status_code=404, detail="QR image not found")
-
-
-# --- AccountCreate model (used above) ---
-
-class AccountCreate(BaseModel):
-    name: str
 
 
 # --- Static files & Frontend ---
