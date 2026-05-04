@@ -33,6 +33,24 @@ jobs:
         with:
           submodules: "false"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: webui/pnpm-lock.yaml
+
+      - name: Build WebUI static assets
+        working-directory: webui
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
       # 步骤 2: 设置 Docker Buildx
       # Buildx 是 Docker 的扩展构建工具，支持多平台构建和缓存优化
       - name: Set up Docker Buildx
@@ -86,4 +104,3 @@ jobs:
           min-versions-to-keep: 5
           delete-only-untagged-versions: 'false' # 设置为 false 以便按版本数量清理，而不仅仅是清理无标签镜像
           ignore-versions: '^(latest|main)$' # 绝对不要删除 latest 或 main 标签
-
