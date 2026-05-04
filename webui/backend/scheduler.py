@@ -220,6 +220,51 @@ class Scheduler:
                 log_file.write(f"\n[WebUI] 执行异常: {e}\n")
             acc_result['success'] = False
         finally:
+            # 运行结束，尝试将特定配置回写到账号覆盖配置中
+            if os.path.exists(temp_config_path):
+                try:
+                    with open(temp_config_path, 'r', encoding='utf-8') as f:
+                        final_config = yaml.load(f) or {}
+                    
+                    # 定义需要持久化回写的项
+                    keys_to_check = [
+                        'last_run_timestamp', 
+                        'echo_of_war_timestamp', 
+                        'already_used_codes',
+                        'power_plan'
+                    ]
+                    # # 自动加入所有以 _timestamp 结尾的键
+                    # for k in final_config.keys():
+                    #     if k.endswith('_timestamp') and k not in keys_to_check:
+                    #         keys_to_check.append(k)
+                    
+                    # 获取现有的覆盖配置
+                    current_override = yaml.load(account.get('config_override') or '') or {}
+                    
+                    changed_keys = []
+                    for key in keys_to_check:
+                        if key in final_config:
+                            if current_override.get(key) != final_config[key]:
+                                current_override[key] = final_config[key]
+                                changed_keys.append(key)
+                    
+                    if changed_keys:
+                        from io import StringIO
+                        stream = StringIO()
+                        yaml.dump(current_override, stream)
+                        account_manager.update_account(account['id'], {'config_override': stream.getvalue()})
+                        
+                        # 记录到运行日志中
+                        with open(log_path, 'a', encoding='utf-8') as log_file:
+                            log_file.write(f"\n[WebUI] 账号运行数据已回写: {', '.join(changed_keys)}\n")
+                except Exception as e:
+                    print(f"回写账号特定配置失败: {e}")
+                    try:
+                        with open(log_path, 'a', encoding='utf-8') as log_file:
+                            log_file.write(f"\n[WebUI] 回写账号配置失败: {e}\n")
+                    except:
+                        pass
+
             self.current_process = None
             if os.path.exists(temp_config_path):
                 try:
