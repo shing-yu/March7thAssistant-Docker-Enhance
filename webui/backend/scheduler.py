@@ -205,19 +205,58 @@ class Scheduler:
         
         try:
             with open(log_path, 'w', encoding='utf-8') as log_file:
-                # 运行 main.py
-                import sys
-                self.current_process = subprocess.Popen(
-                    [sys.executable, 'main.py'],
-                    cwd=os.getcwd(),
-                    env=env,
-                    stdout=log_file,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    encoding='utf-8'
-                )
-                self.current_process.wait()
-                acc_result['success'] = (self.current_process.returncode == 0)
+                # 检查是否开启了调试模式
+                if self.settings.get('debug_mode'):
+                    import time
+                    
+                    def get_ts():
+                        return datetime.now().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3]
+
+                    log_file.write(f"+-------------------------------------------------------------------------------------------------------------------+\n")
+                    log_file.write(f"|                                               [DEBUG] 模拟开始运行                                                |\n")
+                    log_file.write(f"+-------------------------------------------------------------------------------------------------------------------+\n")
+                    log_file.flush()
+                    
+                    mock_flow = [
+                        (f"{get_ts()} | INFO | 正在启动 chrome 浏览器", 2),
+                        (f"{get_ts()} | INFO | 云游戏剩余时长：462 分钟", 1),
+                        (f"{get_ts()} | INFO | 进入云游戏成功", 3),
+                        (f"+-------------------------------------------------------------------------------------------------------------------+\n|                                                 开始获取培养目标                                                  |\n+-------------------------------------------------------------------------------------------------------------------+", 0),
+                        (f"{get_ts()} | INFO | 识别到副本: ('拟造花萼（赤）', '「世界尽头」酒馆')", 3),
+                        (f"{get_ts()} | INFO | 识别到副本: ('历战余响', '铁骸的锈冢')", 2),
+                        (f"{get_ts()} | INFO | 沉浸器: 2/12", 2),
+                        (f"------------------------------------------------ 准备合成 4 个沉浸器 ------------------------------------------------", 3),
+                        (f"{get_ts()} | INFO | 开拓力: 162/300", 2),
+                        (f"+-------------------------------------------------------------------------------------------------------------------+\n|                                                   开始每日实训                                                    |\n+-------------------------------------------------------------------------------------------------------------------+", 0),
+                        (f"{get_ts()} | INFO | 每日实训已完成", 3),
+                        (f"{get_ts()} | INFO | 准备发送 wechatworkapp 通知（级别：全部，图片：是）", 2),
+                        (f"{get_ts()} | INFO | wechatworkapp 通知发送完成", 1),
+                        (f"{get_ts()} | INFO | 关闭浏览器成功", 2),
+                        (f"------------------------------------------------------- 完成 --------------------------------------------------------", 0)
+                    ]
+                    
+                    for line, delay in mock_flow:
+                        if not self.running: break
+                        log_file.write(f"{line}\n")
+                        log_file.flush()
+                        if delay > 0:
+                            time.sleep(delay)
+                    
+                    acc_result['success'] = True
+                else:
+                    # 运行真实的 main.py
+                    import sys
+                    self.current_process = subprocess.Popen(
+                        [sys.executable, 'main.py'],
+                        cwd=os.getcwd(),
+                        env=env,
+                        stdout=log_file,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        encoding='utf-8'
+                    )
+                    self.current_process.wait()
+                    acc_result['success'] = (self.current_process.returncode == 0)
         except Exception as e:
             with open(log_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"\n[WebUI] 执行异常: {e}\n")

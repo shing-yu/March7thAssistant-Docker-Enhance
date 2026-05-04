@@ -17,7 +17,7 @@ const Settings = {
         
         <el-form label-position="top" class="relative z-10 custom-form">
           <div class="mb-8">
-            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-6 flex items-center border-b border-slate-200 dark:border-white/5 pb-4">
+            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-6 flex items-center">
               <el-icon class="mr-2 text-violet-500 dark:text-violet-400"><MagicStick /></el-icon>
               自动化调度
             </h3>
@@ -42,6 +42,21 @@ const Settings = {
                 class="w-full sm:w-64">
               </el-time-picker>
             </div>
+
+            <div class="mt-8 pt-8 border-t border-slate-200 dark:border-white/5">
+              <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-6 flex items-center">
+                <el-icon class="mr-2 text-amber-500 dark:text-amber-400"><Tools /></el-icon>
+                开发与调试
+              </h3>
+              
+              <div class="flex items-start justify-between bg-amber-500/5 dark:bg-amber-500/10 p-5 rounded-xl border border-amber-500/10 dark:border-amber-500/20">
+                <div>
+                  <label class="block text-base font-medium text-amber-700 dark:text-amber-400 mb-1">调试模拟模式</label>
+                  <div class="text-sm text-slate-500 dark:text-slate-400">开启后，点击“立即运行”将仅模拟运行过程输出伪造日志，不会启动真实浏览器及游戏。用于测试 UI 功能和调度逻辑。</div>
+                </div>
+                <el-switch v-model="settings.debug_mode" size="large" active-color="#f59e0b" :disabled="!isAdmin" />
+              </div>
+            </div>
           </div>
 
           <div class="pt-6 border-t border-white/5 flex justify-end">
@@ -60,7 +75,8 @@ const Settings = {
     return {
       settings: {
         auto_run: false,
-        scheduled_time: '04:00'
+        scheduled_time: '04:00',
+        debug_mode: false
       },
       saving: false
     }
