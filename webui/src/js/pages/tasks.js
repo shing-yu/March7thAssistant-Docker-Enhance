@@ -138,7 +138,7 @@ const Tasks = {
                 <div class="config-group-title">
                   <span>{{ group.title }}</span>
                   <el-switch
-                    v-if="isAccountMode"
+                    v-if="isAccountMode && group.name !== 'notify'"
                     :model-value="isGroupOverrideEnabled(group)"
                     @click.stop
                     @change="setGroupOverride(group, $event)"
@@ -900,6 +900,7 @@ const Tasks = {
       await this.updateInstanceTeams(teams);
     },
     isGroupOverrideEnabled(group) {
+      if (group.name === 'notify') return true;
       if (!this.isAccountMode) return true;
       return group.keys.some(key => this.ownConfigHas(key));
     },
@@ -1048,8 +1049,14 @@ const Tasks = {
           this.globalConfigObject = this.clone(this.configObject);
         } else {
           const acc = this.accounts.find(a => a.id === this.selectedAccount);
-          acc.config_override = content;
-          await api.put(`/accounts/${acc.id}`, acc);
+          if (!acc) {
+            throw new Error('账号不存在或已被删除，请刷新账号列表后重试');
+          }
+          const updatedAcc = await api.put(`/accounts/${acc.id}`, {
+            ...acc,
+            config_override: content
+          });
+          this.accounts = this.accounts.map(item => item.id === updatedAcc.id ? updatedAcc : item);
         }
         ElementPlus.ElMessage.success('配置已保存');
       } catch (err) {
